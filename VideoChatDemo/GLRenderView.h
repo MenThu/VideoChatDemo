@@ -7,11 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "VideoManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface GLRenderView : UIView <VideoDelegate>
+@interface GLRenderView : UIView
+
+- (void)showImg:(UIImage *)img isFull:(BOOL)isFull;
 
 @end
 

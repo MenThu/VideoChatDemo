@@ -7,23 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		690201132424AAAE00CFC704 /* fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 6902010F2424AAAE00CFC704 /* fragment.glsl */; };
+		690201142424AAAE00CFC704 /* vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 690201112424AAAE00CFC704 /* vertex.glsl */; };
+		690201152424AAAE00CFC704 /* GLRenderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 690201122424AAAE00CFC704 /* GLRenderView.m */; };
+		6902013B2424B4AC00CFC704 /* RGBTexture.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 6902013A2424B4AC00CFC704 /* RGBTexture.jpg */; };
 		69204B4A2312815F00EFC794 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 69204B492312815F00EFC794 /* AppDelegate.m */; };
 		69204B4D2312815F00EFC794 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69204B4C2312815F00EFC794 /* ViewController.m */; };
 		69204B502312815F00EFC794 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 69204B4E2312815F00EFC794 /* Main.storyboard */; };
 		69204B522312816000EFC794 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 69204B512312816000EFC794 /* Assets.xcassets */; };
 		69204B552312816000EFC794 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 69204B532312816000EFC794 /* LaunchScreen.storyboard */; };
 		69204B582312816000EFC794 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 69204B572312816000EFC794 /* main.m */; };
-		69204B602312819100EFC794 /* VideoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 69204B5F2312819100EFC794 /* VideoManager.m */; };
-		69204B86231287C300EFC794 /* GLRenderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69204B85231287C300EFC794 /* GLRenderView.m */; };
-		69204B892312911200EFC794 /* fragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 69204B872312911200EFC794 /* fragment.glsl */; };
-		69204B8A2312911200EFC794 /* vertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 69204B882312911200EFC794 /* vertex.glsl */; };
-		693E7AF423167A9A00C301D6 /* VideoFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 693E7AF323167A9A00C301D6 /* VideoFrame.m */; };
-		694329E0231D054A00E85941 /* GLViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 694329DF231D054A00E85941 /* GLViewController.m */; };
-		694329E5231D07A500E85941 /* TriangleVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 694329E3231D07A500E85941 /* TriangleVertex.glsl */; };
-		694329E6231D07A500E85941 /* TriangleFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 694329E4231D07A500E85941 /* TriangleFragment.glsl */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6902010F2424AAAE00CFC704 /* fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = fragment.glsl; sourceTree = "<group>"; };
+		690201102424AAAE00CFC704 /* GLRenderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLRenderView.h; sourceTree = "<group>"; };
+		690201112424AAAE00CFC704 /* vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vertex.glsl; sourceTree = "<group>"; };
+		690201122424AAAE00CFC704 /* GLRenderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLRenderView.m; sourceTree = "<group>"; };
+		6902013A2424B4AC00CFC704 /* RGBTexture.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = RGBTexture.jpg; sourceTree = "<group>"; };
 		69204B452312815F00EFC794 /* VideoChatDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VideoChatDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		69204B482312815F00EFC794 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		69204B492312815F00EFC794 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -34,18 +35,6 @@
 		69204B542312816000EFC794 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		69204B562312816000EFC794 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		69204B572312816000EFC794 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		69204B5E2312819100EFC794 /* VideoManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoManager.h; sourceTree = "<group>"; };
-		69204B5F2312819100EFC794 /* VideoManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoManager.m; sourceTree = "<group>"; };
-		69204B84231287C300EFC794 /* GLRenderView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GLRenderView.h; sourceTree = "<group>"; };
-		69204B85231287C300EFC794 /* GLRenderView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GLRenderView.m; sourceTree = "<group>"; };
-		69204B872312911200EFC794 /* fragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = fragment.glsl; sourceTree = "<group>"; };
-		69204B882312911200EFC794 /* vertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vertex.glsl; sourceTree = "<group>"; };
-		693E7AF223167A9A00C301D6 /* VideoFrame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoFrame.h; sourceTree = "<group>"; };
-		693E7AF323167A9A00C301D6 /* VideoFrame.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoFrame.m; sourceTree = "<group>"; };
-		694329DE231D054A00E85941 /* GLViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GLViewController.h; sourceTree = "<group>"; };
-		694329DF231D054A00E85941 /* GLViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GLViewController.m; sourceTree = "<group>"; };
-		694329E3231D07A500E85941 /* TriangleVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TriangleVertex.glsl; sourceTree = "<group>"; };
-		694329E4231D07A500E85941 /* TriangleFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TriangleFragment.glsl; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,45 +67,22 @@
 		69204B472312815F00EFC794 /* VideoChatDemo */ = {
 			isa = PBXGroup;
 			children = (
+				6902013A2424B4AC00CFC704 /* RGBTexture.jpg */,
 				69204B482312815F00EFC794 /* AppDelegate.h */,
 				69204B492312815F00EFC794 /* AppDelegate.m */,
+				69204B512312816000EFC794 /* Assets.xcassets */,
+				690201102424AAAE00CFC704 /* GLRenderView.h */,
+				690201122424AAAE00CFC704 /* GLRenderView.m */,
+				69204B562312816000EFC794 /* Info.plist */,
+				69204B532312816000EFC794 /* LaunchScreen.storyboard */,
+				69204B572312816000EFC794 /* main.m */,
+				69204B4E2312815F00EFC794 /* Main.storyboard */,
+				690201112424AAAE00CFC704 /* vertex.glsl */,
+				6902010F2424AAAE00CFC704 /* fragment.glsl */,
 				69204B4B2312815F00EFC794 /* ViewController.h */,
 				69204B4C2312815F00EFC794 /* ViewController.m */,
-				694329E1231D064500E85941 /* DrawTrangle */,
-				694329E2231D065E00E85941 /* DrawDataFromCamera */,
-				69204B4E2312815F00EFC794 /* Main.storyboard */,
-				69204B512312816000EFC794 /* Assets.xcassets */,
-				69204B532312816000EFC794 /* LaunchScreen.storyboard */,
-				69204B562312816000EFC794 /* Info.plist */,
-				69204B572312816000EFC794 /* main.m */,
 			);
 			path = VideoChatDemo;
-			sourceTree = "<group>";
-		};
-		694329E1231D064500E85941 /* DrawTrangle */ = {
-			isa = PBXGroup;
-			children = (
-				694329DE231D054A00E85941 /* GLViewController.h */,
-				694329DF231D054A00E85941 /* GLViewController.m */,
-				694329E4231D07A500E85941 /* TriangleFragment.glsl */,
-				694329E3231D07A500E85941 /* TriangleVertex.glsl */,
-			);
-			path = DrawTrangle;
-			sourceTree = "<group>";
-		};
-		694329E2231D065E00E85941 /* DrawDataFromCamera */ = {
-			isa = PBXGroup;
-			children = (
-				69204B872312911200EFC794 /* fragment.glsl */,
-				69204B882312911200EFC794 /* vertex.glsl */,
-				693E7AF223167A9A00C301D6 /* VideoFrame.h */,
-				693E7AF323167A9A00C301D6 /* VideoFrame.m */,
-				69204B5E2312819100EFC794 /* VideoManager.h */,
-				69204B5F2312819100EFC794 /* VideoManager.m */,
-				69204B84231287C300EFC794 /* GLRenderView.h */,
-				69204B85231287C300EFC794 /* GLRenderView.m */,
-			);
-			path = DrawDataFromCamera;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -177,12 +143,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				69204B552312816000EFC794 /* LaunchScreen.storyboard in Resources */,
-				694329E6231D07A500E85941 /* TriangleFragment.glsl in Resources */,
-				694329E5231D07A500E85941 /* TriangleVertex.glsl in Resources */,
-				69204B892312911200EFC794 /* fragment.glsl in Resources */,
+				690201132424AAAE00CFC704 /* fragment.glsl in Resources */,
 				69204B522312816000EFC794 /* Assets.xcassets in Resources */,
+				6902013B2424B4AC00CFC704 /* RGBTexture.jpg in Resources */,
 				69204B502312815F00EFC794 /* Main.storyboard in Resources */,
-				69204B8A2312911200EFC794 /* vertex.glsl in Resources */,
+				690201142424AAAE00CFC704 /* vertex.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -193,13 +158,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				694329E0231D054A00E85941 /* GLViewController.m in Sources */,
-				69204B86231287C300EFC794 /* GLRenderView.m in Sources */,
 				69204B4D2312815F00EFC794 /* ViewController.m in Sources */,
 				69204B582312816000EFC794 /* main.m in Sources */,
 				69204B4A2312815F00EFC794 /* AppDelegate.m in Sources */,
-				69204B602312819100EFC794 /* VideoManager.m in Sources */,
-				693E7AF423167A9A00C301D6 /* VideoFrame.m in Sources */,
+				690201152424AAAE00CFC704 /* GLRenderView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
