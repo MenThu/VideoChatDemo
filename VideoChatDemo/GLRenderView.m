@@ -42,11 +42,15 @@ typedef struct{
 
 - (instancetype)init{
     if (self = [super init]) {
-        self.backgroundColor = UIColor.orangeColor;
         [self setupView];
         [self setupOpenGL];
     }
     return self;
+}
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    [self setNeedsLayout];
+    [self layoutIfNeeded];
 }
 
 - (void)layoutSubviews{
@@ -64,21 +68,54 @@ typedef struct{
                               _renderBuffer);
     glViewport(0, 0, _backingWidth, _backingHeight);
     
-    [self showImg:[UIImage imageNamed:@"RGBTexture.jpg"] isFull:NO];
+    static NSInteger index = 1;
+    [self showImg:[UIImage imageNamed:[NSString stringWithFormat:@"test%d.jpg", (int)index++]] isFull:YES];
+    if (index > 5) index = 1;
 }
 
 #pragma mark - Public
 - (void)showImg:(UIImage *)img isFull:(BOOL)isFull{
-//    CGFloat widthDivideHeight = img.size.width/img.size.height;
+    CGFloat renderBufferWidthDivideHeight = _backingWidth/(CGFloat)_backingHeight;
+    CGFloat imgWidthDivideHeight = img.size.width/img.size.height;
+    CGFloat minus = imgWidthDivideHeight - renderBufferWidthDivideHeight;
+    if (isFull) {//全屏展示，裁剪图片
+        CGFloat texturexMinus = 0;
+        CGFloat textureyMinus = 0;
+        if (minus > 0) {//裁剪x轴
+            texturexMinus = (img.size.width - renderBufferWidthDivideHeight*img.size.height)/(2*img.size.width);
+        }else{//裁剪y轴
+            textureyMinus = (img.size.height - img.size.width/renderBufferWidthDivideHeight)/(2*img.size.height);
+        }
+        _shaderCoordinate[0] = (Vertex){{-1, 1, 0}, {texturexMinus, 1-textureyMinus}};    //左上
+        _shaderCoordinate[1] = (Vertex){{-1, -1, 0}, {texturexMinus, textureyMinus}};   //左下
+        _shaderCoordinate[2] = (Vertex){{1, 1, 0}, {1-texturexMinus, 1-textureyMinus}};     //右上
+        _shaderCoordinate[3] = (Vertex){{1, -1, 0}, {1-texturexMinus, textureyMinus}};    //右下
+    }else{//黑边，修改顶点坐标
+        CGFloat vertextxMinus = 0;
+        CGFloat vertextyMinus = 0;
+        if (minus > 0) {//上下留黑边
+            vertextyMinus = (_backingHeight - (_backingWidth/imgWidthDivideHeight))/_backingHeight;
+        }else{//左右留黑边
+            vertextxMinus = (_backingWidth - imgWidthDivideHeight*_backingHeight)/_backingWidth;
+        }
+        _shaderCoordinate[0] = (Vertex){{-1+vertextxMinus, 1-vertextyMinus, 0}, {0, 1}};    //左上
+        _shaderCoordinate[1] = (Vertex){{-1+vertextxMinus, -1+vertextyMinus, 0}, {0, 0}};   //左下
+        _shaderCoordinate[2] = (Vertex){{1-vertextxMinus, 1-vertextyMinus, 0}, {1, 1}};     //右上
+        _shaderCoordinate[3] = (Vertex){{1-vertextxMinus, -1+vertextyMinus, 0}, {1, 0}};    //右下
+    }
 //    if (widthDivideHeight > 1) {//裁剪width边，拉伸height边
 //
 //    }else{
 //
 //    }
-    _shaderCoordinate[0] = (Vertex){{-1, 1, 0}, {0, 1}};    //左上
-    _shaderCoordinate[1] = (Vertex){{-1, -1, 0}, {0, 0}};   //坐下
-    _shaderCoordinate[2] = (Vertex){{1, 1, 0}, {1, 1}};     //右上
-    _shaderCoordinate[3] = (Vertex){{1, -1, 0}, {1, 0}};    //右下
+    
+//    CGFloat y = ((CGFloat)_backingHeight - _backingWidth) / _backingHeight;
+//    2.0f*   (_backingHeight*2);
+    
+//    _shaderCoordinate[0] = (Vertex){{-1, 1-y, 0}, {0, 1}};    //左上
+//    _shaderCoordinate[1] = (Vertex){{-1, -1+y, 0}, {0, 0}};   //坐下
+//    _shaderCoordinate[2] = (Vertex){{1, 1-y, 0}, {1, 1}};     //右上
+//    _shaderCoordinate[3] = (Vertex){{1, -1+y, 0}, {1, 0}};    //右下
     
     GLuint textureId = [self generateTextureIdFromImg:img];
     
