@@ -22,7 +22,24 @@ Vertex initVertices[] = {
     {{0.5, -0.5, 0},{1, 0,1}},  //顶点右下
 };
 
-GLubyte const Indices[] = {
+Vertex SQUARE_VERTEX_FULL[] = {
+    {{-0.5, 0.5, 0},{0,1,1}},
+    {{-0.5, -0.5, 0},{1, 1, 0}},
+    {{0.5, -0.5, 0},{1, 0,1}},
+    
+    {{0.5, -0.5, 0},{1, 0,1}},
+    {{0.5, 0.5, 0},{1, 0,1}},
+    {{-0.5, 0.5, 0},{0,1,1}},
+};
+
+Vertex SQUARE_VERTEX[] = {
+    {{-0.5, 0.5, 0},{0,1,1}},
+    {{-0.5, -0.5, 0},{1, 1, 0}},
+    {{0.5, -0.5, 0},{1, 0,1}},
+    {{0.5, 0.5, 0},{1, 0,1}},
+};
+
+GLubyte const SQUARE_INDICATE[] = {
     0, 1, 2,
     0, 3, 2,
 };
@@ -39,9 +56,11 @@ GLubyte const Indices[] = {
     GLuint          _frameBuffer;
     GLuint          _indexBuffer;
     GLuint          _vetexBuffer;
+    GLuint          _squareVertexBuffer;
     
     GLuint          _vertexPos;
     GLuint          _texturePos;
+    GLuint          _color;
     
     
     GLuint           _textureY;
@@ -125,16 +144,22 @@ GLubyte const Indices[] = {
 }
 
 - (void)setupBuffer{
-    // 创建顶点缓存
+    //创建三角形顶点缓存
     glGenBuffers(1, &_vetexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, _vetexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(initVertices), initVertices, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
+    //创建正方形顶点缓存
+    glGenBuffers(1, &_squareVertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, _squareVertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(SQUARE_VERTEX), SQUARE_VERTEX, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     //设置索引缓冲区
     glGenBuffers(1, &_indexBuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(SQUARE_INDICATE), SQUARE_INDICATE, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -166,10 +191,8 @@ GLubyte const Indices[] = {
     glUseProgram(_programHandle);
 
     //5
-    GLuint positionAttribLocation = glGetAttribLocation(_programHandle, "position");
-    glEnableVertexAttribArray(positionAttribLocation);
-    GLuint colorAttribLocation = glGetAttribLocation(_programHandle, "color");
-    glEnableVertexAttribArray(colorAttribLocation);
+    _vertexPos = glGetAttribLocation(_programHandle, "position");
+    _color = glGetAttribLocation(_programHandle, "color");
 }
 
 - (void)drawPicture{
@@ -184,38 +207,53 @@ GLubyte const Indices[] = {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(_programHandle);
     
-
-    //    [self drawTriangleWithCPUData];
-    [self drawTriangleWithVBOData];
-
+    
+//    [self drawTriangleWithCPUData];
+//        [self drawTriangleWithVBOData];
+    [self drawTriangleWithVEOData];
+    
     
     [_context presentRenderbuffer:GL_RENDERBUFFER];
 }
 
 - (void)drawTriangleWithCPUData{
-    GLuint positionAttribLocation = glGetAttribLocation(_programHandle, "position");
-    glEnableVertexAttribArray(positionAttribLocation);
-    GLuint colorAttribLocation = glGetAttribLocation(_programHandle, "color");
-    glEnableVertexAttribArray(colorAttribLocation);
-    glVertexAttribPointer(positionAttribLocation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (char *)initVertices);
-    glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (char *)initVertices + 3 * sizeof(GLfloat));
+    glEnableVertexAttribArray(_vertexPos);
+    glEnableVertexAttribArray(_color);
+    glVertexAttribPointer(_vertexPos, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (char *)initVertices);
+    glVertexAttribPointer(_color, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (char *)initVertices + 3 * sizeof(GLfloat));
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 - (void)drawTriangleWithVBOData{
-    GLuint positionAttribLocation = glGetAttribLocation(_programHandle, "position");
-    glEnableVertexAttribArray(positionAttribLocation);
-    GLuint colorAttribLocation = glGetAttribLocation(_programHandle, "color");
-    glEnableVertexAttribArray(colorAttribLocation);
+    glEnableVertexAttribArray(_vertexPos);
+    glEnableVertexAttribArray(_color);
     //指定顶点数据来源
     glBindBuffer(GL_ARRAY_BUFFER, _vetexBuffer);
-    glVertexAttribPointer(positionAttribLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *) offsetof(Vertex, position));
-    glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *) offsetof(Vertex, rgbClolor));
+    glVertexAttribPointer(_vertexPos, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *) offsetof(Vertex, position));
+    glVertexAttribPointer(_color, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *) offsetof(Vertex, rgbClolor));
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
+- (void)drawSqureWithVBO{
+    glEnableVertexAttribArray(_vertexPos);
+    glEnableVertexAttribArray(_color);
+    //指定顶点数据来源
+    glBindBuffer(GL_ARRAY_BUFFER, _squareVertexBuffer);
+    glVertexAttribPointer(_vertexPos, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *) offsetof(Vertex, position));
+    glVertexAttribPointer(_color, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *) offsetof(Vertex, rgbClolor));
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
 - (void)drawTriangleWithVEOData{
+    glBindBuffer(GL_ARRAY_BUFFER, _squareVertexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
     
+    glEnableVertexAttribArray(_vertexPos);
+    glEnableVertexAttribArray(_color);
+    glVertexAttribPointer(_vertexPos, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
+    glVertexAttribPointer(_color, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, rgbClolor));
+    
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
 }
 
 - (GLuint)compileShader:(NSString*)shaderName withType:(GLenum)shaderType {
