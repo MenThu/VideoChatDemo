@@ -9,37 +9,23 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #import "GLRenderView.h"
-#import "VideoFrame.h"
 #import <GLKit/GLKit.h>
 
 typedef struct{
-    float Position[3];
-    float TexCoord[2];
+    float position[3];
+    float rgbClolor[3];
 } Vertex;
 
 Vertex initVertices[] = {
-    {{-1, 1, 0},{0,1}},     //顶点左上  纹理左上
-    {{1, 1, 0},{1, 1}},     //顶点右上  纹理左上
-    {{1, -1, 0},{1, 0}},    //顶点右下  纹理右下
-    {{-1, -1, 0},{0, 0}},   //顶点左下  纹理左下
+    {{-0.5, 0, 0},{0,1,1}},   //顶点左上
+    {{0.5, 0.5, 0},{1, 1, 0}},  //顶点右上
+    {{0.5, -0.5, 0},{1, 0,1}},  //顶点右下
 };
 
 GLubyte const Indices[] = {
     0, 1, 2,
     0, 3, 2,
 };
-
-//Vertex initVertices[] = {
-//    {{-1, 1, 0},    {0, 0}}, // 顶点左上    纹理左下
-//    {{-1, -1, 0},   {0, 1}}, // 顶点左下    纹理左上
-//    {{1, -1, 0},    {1, 1}}, // 顶点右下    纹理右上
-//    {{1, 1, 0},     {1, 0}}, // 顶点右上    纹理右下
-//};
-
-//GLubyte const Indices[] = {
-//    0, 1, 2,
-//    0, 3, 2,
-//};
 
 @interface GLRenderView (){
     EAGLContext     *_context;
@@ -75,17 +61,17 @@ GLubyte const Indices[] = {
 @implementation GLRenderView
 
 #pragma mark - LifeCycle
++ (Class)layerClass{
+    return [CAEAGLLayer class];
+}
+
 - (instancetype)init{
     if (self = [super init]) {
-        self.backgroundColor = UIColor.orangeColor;
+        self.backgroundColor = UIColor.whiteColor;
         [self setupView];
         [self setupOpenGL];
     }
     return self;
-}
-
-+ (Class)layerClass{
-    return [CAEAGLLayer class];
 }
 
 - (void)layoutSubviews{
@@ -95,17 +81,22 @@ GLubyte const Indices[] = {
     [_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:_renderLayer];
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_backingWidth);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_backingHeight);
-    
-    glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-                              GL_COLOR_ATTACHMENT0,
-                              GL_RENDERBUFFER,
-                              _renderBuffer);
-    glViewport(0, 0, _backingWidth, _backingHeight);
+    [self drawPicture];
 }
 
 #pragma mark - Private
 - (void)setupView{
+    CAEAGLLayer *glLayer = (CAEAGLLayer *)self.layer;
+    /*
+     *  kEAGLDrawablePropertyRetainedBacking:The key specifying whether the drawable surface retains its contents after displaying them.
+     *  kEAGLDrawablePropertyColorFormat:The key specifying the internal color buffer format for the drawable surface.
+     */
+    glLayer.drawableProperties = @{kEAGLDrawablePropertyRetainedBacking : @(YES), // retained unchange
+                                   kEAGLDrawablePropertyColorFormat     : kEAGLColorFormatRGBA8 // 32-bits Color
+                                   };
+    
+    glLayer.contentsScale = [UIScreen mainScreen].scale;
+    glLayer.opaque = YES;
     self.contentScaleFactor = UIScreen.mainScreen.scale;
 }
 
@@ -145,10 +136,6 @@ GLubyte const Indices[] = {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    
-    glGenTextures(1, &_textureY);
-//    glGenTextures(1, &_textureU);
-//    glGenTextures(1, &_textureV);
 }
 
 - (void)loadShader{
@@ -179,12 +166,56 @@ GLubyte const Indices[] = {
     glUseProgram(_programHandle);
 
     //5
-    _vertexPos = glGetAttribLocation(_programHandle, "position");
-    _texturePos = glGetAttribLocation(_programHandle, "textureCoordinate");
-    _sampleY = glGetUniformLocation(_programHandle, "SamplerY");
-    _sampleU = glGetUniformLocation(_programHandle, "SamplerU");
-    _sampleV = glGetUniformLocation(_programHandle, "SamplerV");
-    _modelTransform = glGetUniformLocation(_programHandle, "modelTransform");
+    GLuint positionAttribLocation = glGetAttribLocation(_programHandle, "position");
+    glEnableVertexAttribArray(positionAttribLocation);
+    GLuint colorAttribLocation = glGetAttribLocation(_programHandle, "color");
+    glEnableVertexAttribArray(colorAttribLocation);
+}
+
+- (void)drawPicture{
+    [EAGLContext setCurrentContext:_context];
+    glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+                              GL_COLOR_ATTACHMENT0,
+                              GL_RENDERBUFFER,
+                              _renderBuffer);
+    glViewport(0, 0, _backingWidth, _backingHeight);
+    glClearColor(0.3, 0.3, 0, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glUseProgram(_programHandle);
+    
+
+    //    [self drawTriangleWithCPUData];
+    [self drawTriangleWithVBOData];
+
+    
+    [_context presentRenderbuffer:GL_RENDERBUFFER];
+}
+
+- (void)drawTriangleWithCPUData{
+    GLuint positionAttribLocation = glGetAttribLocation(_programHandle, "position");
+    glEnableVertexAttribArray(positionAttribLocation);
+    GLuint colorAttribLocation = glGetAttribLocation(_programHandle, "color");
+    glEnableVertexAttribArray(colorAttribLocation);
+    glVertexAttribPointer(positionAttribLocation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (char *)initVertices);
+    glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (char *)initVertices + 3 * sizeof(GLfloat));
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+- (void)drawTriangleWithVBOData{
+    GLuint positionAttribLocation = glGetAttribLocation(_programHandle, "position");
+    glEnableVertexAttribArray(positionAttribLocation);
+    GLuint colorAttribLocation = glGetAttribLocation(_programHandle, "color");
+    glEnableVertexAttribArray(colorAttribLocation);
+    //指定顶点数据来源
+    glBindBuffer(GL_ARRAY_BUFFER, _vetexBuffer);
+    glVertexAttribPointer(positionAttribLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *) offsetof(Vertex, position));
+    glVertexAttribPointer(colorAttribLocation, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *) offsetof(Vertex, rgbClolor));
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+- (void)drawTriangleWithVEOData{
+    
 }
 
 - (GLuint)compileShader:(NSString*)shaderName withType:(GLenum)shaderType {
@@ -225,81 +256,5 @@ GLubyte const Indices[] = {
     
     return shaderHandle;
 }
-
-#pragma mark - DrawVideo
-- (void)didCaptureVideoFrame:(VideoFrame *)frame{
-    glClearColor(0.f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    
-    //I420 -> sampleY sampleU sampleV
-    GLint sampleY = [self generateTexureFromYUVImgData:frame->_imgData width:frame.imgWidth height:frame.imgHeight indexOfTexture:0];
-//    GLint sampleU = [self generateTexureFromYUVImgData:frame->_imgData+frame.imgWidth*frame.imgHeight width:(int)frame.imgWidth/2 height:(int)frame.imgHeight/2 indexOfTexture:1];
-//    GLint sampleV = [self generateTexureFromYUVImgData:frame->_imgData+frame.imgWidth*frame.imgHeight*4/5 width:(int)frame.imgWidth/2 height:(int)frame.imgHeight/2 indexOfTexture:2];
-
-    glUseProgram(_programHandle);
-    
-    //绕Z轴旋转
-    GLKMatrix4 modelMatrix = GLKMatrix4MakeRotation(frame.imgAngle, 0, 0, 1);
-    
-    //XY轴上下翻转
-    modelMatrix = GLKMatrix4Multiply(GLKMatrix4MakeScale(frame.needMirror ? -1 : 1, -1, 1), modelMatrix);
-    
-    glUniformMatrix4fv(_modelTransform, 1, 0, modelMatrix.m);
-
-    //对shader的纹理进行赋值
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, sampleY);
-    glUniform1i(_sampleY, 0);
-
-//    glActiveTexture(GL_TEXTURE1);
-//    glBindTexture(GL_TEXTURE_2D, sampleU);
-//    glUniform1i(_sampleU, 1);
-//
-//    glActiveTexture(GL_TEXTURE2);
-//    glBindTexture(GL_TEXTURE_2D, sampleV);
-//    glUniform1i(_sampleV, 2);
-    
-    //对shader的顶点属性和纹理坐标属性
-    glBindBuffer(GL_ARRAY_BUFFER, _vetexBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
-    
-    glVertexAttribPointer(_vertexPos, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
-    glEnableVertexAttribArray(_vertexPos);
-    glVertexAttribPointer(_texturePos, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
-    glEnableVertexAttribArray(_texturePos);
-    
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
-//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    
-    if ([EAGLContext currentContext] == _context) {
-        [_context presentRenderbuffer:GL_RENDERBUFFER];
-    }
-    
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-- (GLuint)generateTexureFromYUVImgData:(Byte *)imgData width:(int)imgWidth height:(int)imgHeight indexOfTexture:(int)index{
-    GLuint textureID;
-    if (index == 0) {//y
-        textureID = _textureY;
-    }else if (index == 1){//u
-        textureID = _textureU;
-    }else{//v
-        textureID = _textureV;
-    }
-    
-    glBindTexture(GL_TEXTURE_2D, textureID);
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, imgWidth, imgHeight, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, imgData); // 将图片数据写入纹理缓存
-    
-    glBindTexture(GL_TEXTURE_2D, 0);
-    return textureID;
-}
-
 
 @end
