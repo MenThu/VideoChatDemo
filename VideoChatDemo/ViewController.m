@@ -34,6 +34,7 @@
     self.videoManager = [[VideoManager alloc] initWithDelegate:renderView isFront:(_isFront = YES)];
     
     UIButton *switchButon = [UIButton buttonWithType:UIButtonTypeCustom];
+    [switchButon setTitle:@"切换摄像头" forState:UIControlStateNormal];
     switchButon.backgroundColor = UIColor.orangeColor;
     [switchButon addTarget:self action:@selector(switchCameraAction) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:(_switchButon = switchButon)];
