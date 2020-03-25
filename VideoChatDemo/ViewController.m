@@ -30,4 +30,17 @@
     self.renderView.frame = self.view.bounds;
 }
 
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    NSInteger temp1 = rand()%5 + 1;
+    NSInteger temp2 = rand()%5 + 1;
+    CGFloat width = self.view.bounds.size.width / temp1;
+    CGFloat height = self.view.bounds.size.width / temp2;
+    CGFloat x = (self.view.bounds.size.width - width)/2;
+    CGFloat y = (self.view.bounds.size.height - height)/2;
+    [UIView animateWithDuration:0.25 animations:^{
+        self.renderView.frame = CGRectMake(x, y, width, height);
+    }];
+}
+
 @end

@@ -48,11 +48,6 @@ typedef struct{
     return self;
 }
 
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    [self setNeedsLayout];
-    [self layoutIfNeeded];
-}
-
 - (void)layoutSubviews{
     [super layoutSubviews];
     _renderLayer = (CAEAGLLayer *)self.layer;
@@ -69,8 +64,8 @@ typedef struct{
     glViewport(0, 0, _backingWidth, _backingHeight);
     
     static NSInteger index = 1;
-    [self showImg:[UIImage imageNamed:[NSString stringWithFormat:@"test%d.jpg", (int)index++]] isFull:YES];
-    if (index > 5) index = 1;
+    [self showImg:[UIImage imageNamed:[NSString stringWithFormat:@"test%d.jpg", (int)index]] isFull:NO];
+//    if (++index > 5) index = 1;
 }
 
 #pragma mark - Public
@@ -103,19 +98,6 @@ typedef struct{
         _shaderCoordinate[2] = (Vertex){{1-vertextxMinus, 1-vertextyMinus, 0}, {1, 1}};     //右上
         _shaderCoordinate[3] = (Vertex){{1-vertextxMinus, -1+vertextyMinus, 0}, {1, 0}};    //右下
     }
-//    if (widthDivideHeight > 1) {//裁剪width边，拉伸height边
-//
-//    }else{
-//
-//    }
-    
-//    CGFloat y = ((CGFloat)_backingHeight - _backingWidth) / _backingHeight;
-//    2.0f*   (_backingHeight*2);
-    
-//    _shaderCoordinate[0] = (Vertex){{-1, 1-y, 0}, {0, 1}};    //左上
-//    _shaderCoordinate[1] = (Vertex){{-1, -1+y, 0}, {0, 0}};   //坐下
-//    _shaderCoordinate[2] = (Vertex){{1, 1-y, 0}, {1, 1}};     //右上
-//    _shaderCoordinate[3] = (Vertex){{1, -1+y, 0}, {1, 0}};    //右下
     
     GLuint textureId = [self generateTextureIdFromImg:img];
     
