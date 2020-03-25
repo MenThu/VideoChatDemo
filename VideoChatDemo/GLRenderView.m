@@ -11,6 +11,8 @@
 #import "GLRenderView.h"
 #import <GLKit/GLKit.h>
 
+static NSString * const IMG_NAME = @"test1.jpg";
+
 typedef struct{
     float Position[3];
     float TexCoord[2];
@@ -29,7 +31,11 @@ typedef struct{
     GLuint          _vertexPos;
     GLuint          _texturePos;
     GLuint           _textureUniform;
+    GLuint          _textureId;
 }
+
+@property (nonatomic, assign) CGFloat xOffset;
+@property (nonatomic, assign) CGFloat yOffset;
 
 @end
 
@@ -44,17 +50,57 @@ typedef struct{
     if (self = [super init]) {
         [self setupView];
         [self setupOpenGL];
+        [self addPanGesture];
     }
     return self;
 }
 
+- (void)addPanGesture{
+    self.xOffset = self.yOffset = 0.f;
+    UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGesture:)];
+    [self addGestureRecognizer:panGesture];
+}
+
+- (void)panGesture:(UIPanGestureRecognizer *)gesture{
+    static CGFloat xBeginPosition = 0.f;
+    static CGFloat yBeginPosition = 0.f;
+    CGPoint velcity = [gesture velocityInView:self];
+    CGPoint panGesturePoint = [gesture locationInView:self];
+    if (fabs(velcity.x) > fabs(velcity.y)) {
+        if (gesture.state == UIGestureRecognizerStateBegan) {
+            xBeginPosition = panGesturePoint.x;
+        }else if (gesture.state == UIGestureRecognizerStateChanged){
+            self.xOffset += -(panGesturePoint.x - xBeginPosition);
+            xBeginPosition = panGesturePoint.x;
+            [self showImg:[UIImage imageNamed:IMG_NAME]];
+        }
+    }else{
+        if (gesture.state == UIGestureRecognizerStateBegan) {
+            yBeginPosition = panGesturePoint.y;
+        }else if (gesture.state == UIGestureRecognizerStateChanged){
+            self.yOffset += -(panGesturePoint.y - yBeginPosition);
+            yBeginPosition = panGesturePoint.y;
+            [self showImg:[UIImage imageNamed:IMG_NAME]];
+        }
+    }
+}
+
 - (void)layoutSubviews{
     [super layoutSubviews];
+    static BOOL isImgShow = NO;
+    if (isImgShow) {
+        return;
+    }
+    if (_backingWidth == self.bounds.size.width * UIScreen.mainScreen.scale && _backingHeight == self.bounds.size.height * UIScreen.mainScreen.scale) {
+        isImgShow = YES;
+    }
     _renderLayer = (CAEAGLLayer *)self.layer;
     glBindRenderbuffer(GL_RENDERBUFFER, _renderBuffer);
     [_context renderbufferStorage:GL_RENDERBUFFER fromDrawable:_renderLayer];
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &_backingWidth);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_backingHeight);
+    
+    
     
     glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER,
@@ -63,44 +109,61 @@ typedef struct{
                               _renderBuffer);
     glViewport(0, 0, _backingWidth, _backingHeight);
     
-    static NSInteger index = 1;
-    [self showImg:[UIImage imageNamed:[NSString stringWithFormat:@"test%d.jpg", (int)index]] isFull:NO];
-//    if (++index > 5) index = 1;
+    
+    UIImage *pngImg = [UIImage imageNamed:IMG_NAME];
+    [self showImg:pngImg];
 }
 
 #pragma mark - Public
-- (void)showImg:(UIImage *)img isFull:(BOOL)isFull{
-    CGFloat renderBufferWidthDivideHeight = _backingWidth/(CGFloat)_backingHeight;
-    CGFloat imgWidthDivideHeight = img.size.width/img.size.height;
-    CGFloat minus = imgWidthDivideHeight - renderBufferWidthDivideHeight;
-    if (isFull) {//全屏展示，裁剪图片
-        CGFloat texturexMinus = 0;
-        CGFloat textureyMinus = 0;
-        if (minus > 0) {//裁剪x轴
-            texturexMinus = (img.size.width - renderBufferWidthDivideHeight*img.size.height)/(2*img.size.width);
-        }else{//裁剪y轴
-            textureyMinus = (img.size.height - img.size.width/renderBufferWidthDivideHeight)/(2*img.size.height);
-        }
-        _shaderCoordinate[0] = (Vertex){{-1, 1, 0}, {texturexMinus, 1-textureyMinus}};    //左上
-        _shaderCoordinate[1] = (Vertex){{-1, -1, 0}, {texturexMinus, textureyMinus}};   //左下
-        _shaderCoordinate[2] = (Vertex){{1, 1, 0}, {1-texturexMinus, 1-textureyMinus}};     //右上
-        _shaderCoordinate[3] = (Vertex){{1, -1, 0}, {1-texturexMinus, textureyMinus}};    //右下
-    }else{//黑边，修改顶点坐标
-        CGFloat vertextxMinus = 0;
-        CGFloat vertextyMinus = 0;
-        if (minus > 0) {//上下留黑边
-            vertextyMinus = (_backingHeight - (_backingWidth/imgWidthDivideHeight))/_backingHeight;
-        }else{//左右留黑边
-            vertextxMinus = (_backingWidth - imgWidthDivideHeight*_backingHeight)/_backingWidth;
-        }
-        _shaderCoordinate[0] = (Vertex){{-1+vertextxMinus, 1-vertextyMinus, 0}, {0, 1}};    //左上
-        _shaderCoordinate[1] = (Vertex){{-1+vertextxMinus, -1+vertextyMinus, 0}, {0, 0}};   //左下
-        _shaderCoordinate[2] = (Vertex){{1-vertextxMinus, 1-vertextyMinus, 0}, {1, 1}};     //右上
-        _shaderCoordinate[3] = (Vertex){{1-vertextxMinus, -1+vertextyMinus, 0}, {1, 0}};    //右下
+- (void)showImg:(UIImage *)img{
+    CGFloat imgPixelWidth = CGImageGetWidth(img.CGImage);
+    CGFloat imgPixelHeight = CGImageGetHeight(img.CGImage);
+    
+    CGFloat vertexXMin = -1;
+    CGFloat verTexYMin = -1;
+    CGFloat verTexXMax = 1;
+    CGFloat verTexYMax = 1;
+    
+    CGFloat textureXMin = 0;
+    CGFloat textureYMin = 0;
+    CGFloat textureXMax = 1;
+    CGFloat textureYMax = 1;
+    
+    CGFloat widthSubtract = imgPixelWidth - _backingWidth;
+    CGFloat heightSubtract = imgPixelHeight - _backingHeight;
+    CGFloat space2XEdge = -widthSubtract/_backingWidth;
+    CGFloat space2YEdge = -heightSubtract/_backingHeight;
+    
+    
+    if (widthSubtract < 0) {//图像宽度 小于 屏幕宽度
+        vertexXMin = -1 + space2XEdge - 2*self.xOffset/self.bounds.size.width;
+        verTexXMax = vertexXMin + 2*imgPixelWidth/_backingWidth;
+    }else{
+        textureXMin = MIN(widthSubtract/imgPixelWidth, MAX(0, self.xOffset/imgPixelWidth));
+        textureXMax = textureXMin + _backingWidth/imgPixelWidth;
     }
+    
+    if (heightSubtract < 0) {//图像高度 小于 屏幕高度
+        verTexYMin = -1 + space2YEdge + 2*self.yOffset/self.bounds.size.height;
+        verTexYMax = verTexYMin + 2*imgPixelHeight/_backingHeight;
+    }else{
+        textureYMin = MIN(heightSubtract/imgPixelHeight, MAX(0, -self.yOffset/imgPixelHeight));
+        textureYMax = textureYMin + _backingHeight/imgPixelHeight;
+    }
+    
+    NSLog(@"offset=[%f][%f]", _xOffset, _yOffset);
+    NSLog(@"vertext=[%f][%f][%f][%f]", vertexXMin, verTexXMax, verTexYMin, verTexYMax);
+//    NSLog(@"texture=[%f][%f][%f][%f]", textureXMin, textureXMax, textureYMin, textureYMax);
+    
+    _shaderCoordinate[0] = (Vertex){{vertexXMin, verTexYMax, 0}, {textureXMin, textureYMax}};    //左上
+    _shaderCoordinate[1] = (Vertex){{vertexXMin, verTexYMin, 0}, {textureXMin, textureYMin}};   //左下
+    _shaderCoordinate[2] = (Vertex){{verTexXMax, verTexYMax, 0}, {textureXMax, textureYMax}};     //右上
+    _shaderCoordinate[3] = (Vertex){{verTexXMax, verTexYMin, 0}, {textureXMax, textureYMin}};    //右下
     
     GLuint textureId = [self generateTextureIdFromImg:img];
     
+    glClearColor(0.f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(_programHandle);
     glViewport(0, 0, _backingWidth, _backingHeight);
     
@@ -145,10 +208,7 @@ typedef struct{
     CGContextClearRect(context, rect);
     CGContextDrawImage(context, rect, cgImageRef);
 
-    // 生成纹理
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData); // 将图片数据写入纹理缓存
     
     // 设置如何把纹素映射成像素
@@ -164,7 +224,7 @@ typedef struct{
     CGContextRelease(context);
     free(imageData);
     
-    return textureID;
+    return _textureId;
 }
 
 #pragma mark - Private
@@ -200,6 +260,9 @@ typedef struct{
 - (void)setupBuffer{
     // 创建顶点缓存
     glGenBuffers(1, &_vetexBuffer);
+    
+    // 生成纹理
+    glGenTextures(1, &_textureId);
 }
 
 - (void)loadShader{

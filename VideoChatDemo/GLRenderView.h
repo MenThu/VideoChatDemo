@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface GLRenderView : UIView
 
-- (void)showImg:(UIImage *)img isFull:(BOOL)isFull;
+- (void)showImg:(UIImage *)img;
 
 @end
 

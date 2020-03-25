@@ -21,6 +21,8 @@
 		69204B522312816000EFC794 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 69204B512312816000EFC794 /* Assets.xcassets */; };
 		69204B552312816000EFC794 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 69204B532312816000EFC794 /* LaunchScreen.storyboard */; };
 		69204B582312816000EFC794 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 69204B572312816000EFC794 /* main.m */; };
+		69E57E9C242B334400ED9174 /* ScreenShot.png in Resources */ = {isa = PBXBuildFile; fileRef = 69E57E9B242B334400ED9174 /* ScreenShot.png */; };
+		69E57E9E242B395600ED9174 /* snapshot.png in Resources */ = {isa = PBXBuildFile; fileRef = 69E57E9D242B395600ED9174 /* snapshot.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +45,8 @@
 		69204B542312816000EFC794 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		69204B562312816000EFC794 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		69204B572312816000EFC794 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		69E57E9B242B334400ED9174 /* ScreenShot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ScreenShot.png; sourceTree = "<group>"; };
+		69E57E9D242B395600ED9174 /* snapshot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = snapshot.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +79,8 @@
 		69204B472312815F00EFC794 /* VideoChatDemo */ = {
 			isa = PBXGroup;
 			children = (
+				69E57E9D242B395600ED9174 /* snapshot.png */,
+				69E57E9B242B334400ED9174 /* ScreenShot.png */,
 				6902016E2424D77400CFC704 /* test1.jpg */,
 				6902016F2424D77400CFC704 /* test2.jpg */,
 				690201702424D77400CFC704 /* test3.jpg */,
@@ -157,7 +163,9 @@
 				69204B552312816000EFC794 /* LaunchScreen.storyboard in Resources */,
 				690201712424D77400CFC704 /* test1.jpg in Resources */,
 				690201132424AAAE00CFC704 /* fragment.glsl in Resources */,
+				69E57E9E242B395600ED9174 /* snapshot.png in Resources */,
 				69204B522312816000EFC794 /* Assets.xcassets in Resources */,
+				69E57E9C242B334400ED9174 /* ScreenShot.png in Resources */,
 				69204B502312815F00EFC794 /* Main.storyboard in Resources */,
 				6902016D2424D72D00CFC704 /* test5.jpg in Resources */,
 				690201142424AAAE00CFC704 /* vertex.glsl in Resources */,
