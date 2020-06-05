@@ -101,7 +101,6 @@ typedef struct{
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &_backingHeight);
     
     
-    
     glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER,
                               GL_COLOR_ATTACHMENT0,
@@ -165,7 +164,8 @@ typedef struct{
     glClearColor(0.f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(_programHandle);
-    glViewport(0, 0, _backingWidth, _backingHeight);
+    CGFloat yOffset = 200;
+    glViewport(0, yOffset*self.contentScaleFactor, _backingWidth, _backingHeight);
     
     //设置纹理
     glActiveTexture(GL_TEXTURE0);
@@ -186,6 +186,34 @@ typedef struct{
     
     // 开始绘制
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+#if 0
+        UIImage *img2 = [UIImage imageNamed:@"test2.jpg"];
+        GLuint textureId2 = [self generateTextureIdFromImg:img2];
+
+        glViewport(_backingWidth/2, 0, _backingWidth/2, _backingHeight);
+        
+        //设置纹理
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureId2);
+        glUniform1i(_textureUniform, 0);
+        
+        //设置顶点数据
+        glBindBuffer(GL_ARRAY_BUFFER, _vetexBuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex)*4, _shaderCoordinate, GL_STATIC_DRAW);
+        
+        //激活顶点
+        glEnableVertexAttribArray(_vertexPos);
+        glVertexAttribPointer(_vertexPos, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL + offsetof(Vertex, Position));
+        
+        // 设置纹理数据
+        glEnableVertexAttribArray(_texturePos);
+        glVertexAttribPointer(_texturePos, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL + offsetof(Vertex, TexCoord));
+        
+        // 开始绘制
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+#endif
+    
     
     // 将绑定的渲染缓存呈现到屏幕上
     [_context presentRenderbuffer:GL_RENDERBUFFER];
@@ -230,6 +258,7 @@ typedef struct{
 #pragma mark - Private
 - (void)setupView{
     _shaderCoordinate = malloc(sizeof(Vertex) * 4);//根据现实的图片动态更改数据
+    self.backgroundColor = UIColor.orangeColor;
     self.contentScaleFactor = UIScreen.mainScreen.scale;
 }
 

@@ -21,8 +21,14 @@
 		69204B522312816000EFC794 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 69204B512312816000EFC794 /* Assets.xcassets */; };
 		69204B552312816000EFC794 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 69204B532312816000EFC794 /* LaunchScreen.storyboard */; };
 		69204B582312816000EFC794 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 69204B572312816000EFC794 /* main.m */; };
+		69C864292465918500BF21FA /* MTGLContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C864262465918500BF21FA /* MTGLContext.m */; };
+		69C8642C2465923D00BF21FA /* MTGLShader.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C8642B2465923D00BF21FA /* MTGLShader.m */; };
+		69C8642F246594B700BF21FA /* MTGLCanvasView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C8642E246594B700BF21FA /* MTGLCanvasView.m */; };
+		69C864322465981500BF21FA /* MTImgShader.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C864312465981500BF21FA /* MTImgShader.m */; };
+		69C8643524659E8300BF21FA /* MTGLRenderTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C8643424659E8300BF21FA /* MTGLRenderTask.m */; };
 		69E57E9C242B334400ED9174 /* ScreenShot.png in Resources */ = {isa = PBXBuildFile; fileRef = 69E57E9B242B334400ED9174 /* ScreenShot.png */; };
 		69E57E9E242B395600ED9174 /* snapshot.png in Resources */ = {isa = PBXBuildFile; fileRef = 69E57E9D242B395600ED9174 /* snapshot.png */; };
+		69FF159F248626920082DC74 /* MTGLTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 69FF159E248626920082DC74 /* MTGLTool.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,8 +51,21 @@
 		69204B542312816000EFC794 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		69204B562312816000EFC794 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		69204B572312816000EFC794 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		69C864262465918500BF21FA /* MTGLContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTGLContext.m; sourceTree = "<group>"; };
+		69C864272465918500BF21FA /* MTGLHead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTGLHead.h; sourceTree = "<group>"; };
+		69C864282465918500BF21FA /* MTGLContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTGLContext.h; sourceTree = "<group>"; };
+		69C8642A2465923D00BF21FA /* MTGLShader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTGLShader.h; sourceTree = "<group>"; };
+		69C8642B2465923D00BF21FA /* MTGLShader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTGLShader.m; sourceTree = "<group>"; };
+		69C8642D246594B700BF21FA /* MTGLCanvasView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTGLCanvasView.h; sourceTree = "<group>"; };
+		69C8642E246594B700BF21FA /* MTGLCanvasView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTGLCanvasView.m; sourceTree = "<group>"; };
+		69C864302465981500BF21FA /* MTImgShader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTImgShader.h; sourceTree = "<group>"; };
+		69C864312465981500BF21FA /* MTImgShader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTImgShader.m; sourceTree = "<group>"; };
+		69C8643324659E8300BF21FA /* MTGLRenderTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTGLRenderTask.h; sourceTree = "<group>"; };
+		69C8643424659E8300BF21FA /* MTGLRenderTask.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTGLRenderTask.m; sourceTree = "<group>"; };
 		69E57E9B242B334400ED9174 /* ScreenShot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ScreenShot.png; sourceTree = "<group>"; };
 		69E57E9D242B395600ED9174 /* snapshot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = snapshot.png; sourceTree = "<group>"; };
+		69FF159D248626920082DC74 /* MTGLTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTGLTool.h; sourceTree = "<group>"; };
+		69FF159E248626920082DC74 /* MTGLTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTGLTool.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +98,7 @@
 		69204B472312815F00EFC794 /* VideoChatDemo */ = {
 			isa = PBXGroup;
 			children = (
+				69C864252465918500BF21FA /* MTGLKit */,
 				69E57E9D242B395600ED9174 /* snapshot.png */,
 				69E57E9B242B334400ED9174 /* ScreenShot.png */,
 				6902016E2424D77400CFC704 /* test1.jpg */,
@@ -101,6 +121,26 @@
 				69204B4C2312815F00EFC794 /* ViewController.m */,
 			);
 			path = VideoChatDemo;
+			sourceTree = "<group>";
+		};
+		69C864252465918500BF21FA /* MTGLKit */ = {
+			isa = PBXGroup;
+			children = (
+				69C8642D246594B700BF21FA /* MTGLCanvasView.h */,
+				69C8642E246594B700BF21FA /* MTGLCanvasView.m */,
+				69C864282465918500BF21FA /* MTGLContext.h */,
+				69C864262465918500BF21FA /* MTGLContext.m */,
+				69C864272465918500BF21FA /* MTGLHead.h */,
+				69C8643324659E8300BF21FA /* MTGLRenderTask.h */,
+				69C8643424659E8300BF21FA /* MTGLRenderTask.m */,
+				69C8642A2465923D00BF21FA /* MTGLShader.h */,
+				69C8642B2465923D00BF21FA /* MTGLShader.m */,
+				69FF159D248626920082DC74 /* MTGLTool.h */,
+				69FF159E248626920082DC74 /* MTGLTool.m */,
+				69C864302465981500BF21FA /* MTImgShader.h */,
+				69C864312465981500BF21FA /* MTImgShader.m */,
+			);
+			path = MTGLKit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -182,10 +222,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				69C8642C2465923D00BF21FA /* MTGLShader.m in Sources */,
+				69C864292465918500BF21FA /* MTGLContext.m in Sources */,
 				69204B4D2312815F00EFC794 /* ViewController.m in Sources */,
 				69204B582312816000EFC794 /* main.m in Sources */,
+				69C8643524659E8300BF21FA /* MTGLRenderTask.m in Sources */,
+				69FF159F248626920082DC74 /* MTGLTool.m in Sources */,
 				69204B4A2312815F00EFC794 /* AppDelegate.m in Sources */,
+				69C864322465981500BF21FA /* MTImgShader.m in Sources */,
 				690201152424AAAE00CFC704 /* GLRenderView.m in Sources */,
+				69C8642F246594B700BF21FA /* MTGLCanvasView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
