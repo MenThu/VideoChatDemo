@@ -90,6 +90,7 @@
                               self.renderBuffer);
     glClearColor(0.f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+    NSLog(@"%s", __FUNCTION__);
     for (MTGLRenderTask *task in self.taskArray) {
         [task render];
     }

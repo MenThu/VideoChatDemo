@@ -10,6 +10,7 @@
 #import "ViewController.h"
 #import "GLRenderView.h"
 #import "MTGLCanvasView.h"
+#import "YUVManager.h"
 
 #define CANVAS_MODE 1
 
@@ -25,7 +26,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    return;
 #if CANVAS_MODE == 1
     [self addCanvasView];
 #else
@@ -57,6 +58,7 @@
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    NSLog(@"%s", __FUNCTION__);
     [self.glCanvasView startDisplay];
 }
 
