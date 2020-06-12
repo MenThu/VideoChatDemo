@@ -20,10 +20,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CameraManager : NSObject
 
-@property (nonatomic, weak) id<CameraProtocol> cameraDelegate;
 - (void)startCapture;
 - (void)stopCapture;
 - (void)switchCameraPosition:(BOOL)isFront;
+
+@property (nonatomic, weak) id<CameraProtocol> cameraDelegate;
+@property (nonatomic, assign, readonly) BOOL isRunning;
+@property (nonatomic, assign, readonly) BOOL isCameraFront;
 
 @end
 

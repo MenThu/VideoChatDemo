@@ -7,14 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MTGLRenderTask.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTGLCanvasView : UIView
 
-- (void)addImg:(NSString *)imgName inFrame:(CGRect)frame scaleImg2Fit:(BOOL)scaleImg2Fit;
+@property (nonatomic, strong, readonly) NSMutableArray <MTGLRenderTask *> *taskArray;
+
+- (void)addRenderTask:(CGRect)frame withIdentifier:(NSUInteger)identifier;
 - (void)startDisplay;
 - (void)stopDisplay;
+
 
 @end
 

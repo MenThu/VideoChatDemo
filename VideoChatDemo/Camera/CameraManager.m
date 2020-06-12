@@ -6,20 +6,24 @@
 //  Copyright © 2020 menthu. All rights reserved.
 //
 
-#import "CameraManager.h"
 #import <AVFoundation/AVFoundation.h>
+#import <UIKit/UIKit.h>
+#import "CameraManager.h"
+#import "YUVManager.h"
+
 
 static NSInteger const FRAME_PER_SECOND = 20;
 
 @interface CameraManager () <AVCaptureVideoDataOutputSampleBufferDelegate>
 
-@property (nonatomic, assign) BOOL isCameraFront;
+@property (nonatomic, assign, readwrite) BOOL isCameraFront;
 @property (nonatomic, strong) dispatch_queue_t sessionQueue;
 @property (strong, nonatomic) AVCaptureSession *session;
 @property (nonatomic, strong) AVCaptureDevice *captureDevice;
 @property (weak, nonatomic) AVCaptureDeviceInput *videoDataInput;
 @property (weak, nonatomic) AVCaptureVideoDataOutput *sessionVideoOutput;
 @property (weak, nonatomic) AVCaptureConnection *outputConnection;
+@property (nonatomic, assign, readwrite) BOOL isRunning;
 
 @end
 
@@ -34,7 +38,8 @@ static NSInteger const FRAME_PER_SECOND = 20;
 }
 
 - (void)initData{
-   self.isCameraFront = YES;
+    self.isCameraFront = YES;
+    self.isRunning = NO;
 }
 
 - (void)initSession{
@@ -101,12 +106,14 @@ static NSInteger const FRAME_PER_SECOND = 20;
 - (void)startCapture{
     if (![self.session isRunning]) {
         [self.session startRunning];
+        self.isRunning = YES;
     }
 }
 
 - (void)stopCapture{
     if ([self.session isRunning]) {
         [self.session stopRunning];
+        self.isRunning = NO;
     }
 }
 
@@ -178,7 +185,7 @@ static NSInteger const FRAME_PER_SECOND = 20;
     return nil;
 }
 
-#pragma mark - aaa
+#pragma mark - AVCaptureVideoDataOutputSampleBufferDelegate
 - (void)captureOutput:(AVCaptureOutput *)output
     didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
            fromConnection:(AVCaptureConnection *)connection {
@@ -210,16 +217,12 @@ static NSInteger const FRAME_PER_SECOND = 20;
         size_t width = CVPixelBufferGetWidth(imageBuffer);
         size_t heightOfYPlane = CVPixelBufferGetHeightOfPlane(imageBuffer, 0);
         size_t heightOfUVPlane = CVPixelBufferGetHeightOfPlane(imageBuffer, 1);
-        size_t totalHeight = CVPixelBufferGetHeight(imageBuffer);
 
         /*
          *  CVPixelBufferGetBaseAddressOfPlane 获取每个平面的指针
          */
         unsigned char *baseAddrYPlane = (unsigned char *)CVPixelBufferGetBaseAddressOfPlane(imageBuffer, 0);
         unsigned char *baseAddrUVPlane = (unsigned char *)CVPixelBufferGetBaseAddressOfPlane(imageBuffer, 1);
-        unsigned char *totalPixelPlane = (unsigned char *)CVPixelBufferGetBaseAddress(imageBuffer);
-
-        NSLog(@"heightOfYPlane=[%d] heightOfUVPlane=[%d] totalHeight=[%d]", heightOfYPlane, heightOfUVPlane, totalHeight);
 
         size_t numberPerRowOfYPlane = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer, 0);
         size_t numberPerRowOfUVPlane = CVPixelBufferGetBytesPerRowOfPlane(imageBuffer, 1);
@@ -235,17 +238,18 @@ static NSInteger const FRAME_PER_SECOND = 20;
          *  剔除YUV中可能存在Padding内容
          */
         size_t nBufferSize = width * (heightOfYPlane + heightOfUVPlane);
-        unsigned char *pCamBuffer = (unsigned char *)malloc(nBufferSize);
-        if (!pCamBuffer) {
+        unsigned char *nv12Buffer = (unsigned char *)malloc(nBufferSize);
+        unsigned char *i420Buffer = (unsigned char *)malloc(nBufferSize);
+        if (!nv12Buffer) {
             NSLog(@"new buffer exception:captureOutput ;size:%lu", nBufferSize);
             CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
             return;
         }
 
-        unsigned char *pTempBuffer = pCamBuffer;
+        unsigned char *pTempBuffer = nv12Buffer;
         if (numberPerRowOfUVPlane == width) {
-            memcpy(pCamBuffer, baseAddrYPlane, width * heightOfYPlane);
-            memcpy(pCamBuffer + width * heightOfYPlane, baseAddrUVPlane, width * heightOfUVPlane);
+            memcpy(nv12Buffer, baseAddrYPlane, width * heightOfYPlane);
+            memcpy(nv12Buffer + width * heightOfYPlane, baseAddrUVPlane, width * heightOfUVPlane);
         } else {
             for (int i = 0; i < heightOfYPlane; i++) {
                 memcpy(pTempBuffer, baseAddrYPlane + extraRowsOnTop * numberPerRowOfYPlane + extraColumnsOnLeft, width);
@@ -263,15 +267,28 @@ static NSInteger const FRAME_PER_SECOND = 20;
             }
         }
         CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+
+        [YUVManager converNV12:nv12Buffer toToI420:i420Buffer width:(int)width height:(int)heightOfYPlane];
         
+        free(nv12Buffer);
+        nv12Buffer = NULL;
         
         VideoFrame *frame = [VideoFrame new];
-        frame.yuvBuffer = pCamBuffer;
+        frame.yuvBuffer = i420Buffer;
         frame.yuvBufferSize = nBufferSize;
         frame.width = width;
         frame.height = heightOfYPlane;
-        [self.cameraDelegate didCaptureVideoFrame:frame];
+        frame.rotation = [self getImageRotation];
+        frame.format = VideoFormatI420;
+        frame.needMirror = self.isCameraFront ? YES : NO;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.cameraDelegate didCaptureVideoFrame:frame];
+        });
     }
+}
+
+- (VideoRotation)getImageRotation{
+    return VideoRotation_90;
 }
 
 @end

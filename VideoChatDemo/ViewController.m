@@ -11,14 +11,19 @@
 #import "GLRenderView.h"
 #import "MTGLCanvasView.h"
 #import "YUVManager.h"
+#import "CameraManager.h"
 
 #define CANVAS_MODE 1
 
-@interface ViewController ()
+@interface ViewController () <CameraProtocol>
 
 @property (nonatomic, weak) GLRenderView *renderView;
-
 @property (nonatomic, weak) MTGLCanvasView *glCanvasView;
+@property (nonatomic, strong) CameraManager *cameraManager;
+@property (weak, nonatomic) IBOutlet UIButton *addRenderTaskButton;
+
+@property (nonatomic, strong) NSMutableArray <NSValue *> *renderTaskFrameArray;
+@property (nonatomic, assign) NSInteger currentTaskCount;
 
 @end
 
@@ -26,52 +31,81 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    return;
-#if CANVAS_MODE == 1
-    [self addCanvasView];
-#else
-    [self addRenderView];
-#endif
+    
+    [self initData];
+    [self initCanvasView];
+    [self initCameraManager];
+}
+
+- (void)initData{
+    self.currentTaskCount = 0;
+    self.renderTaskFrameArray = [NSMutableArray array];
+    
+    [self.renderTaskFrameArray addObject:[NSValue valueWithCGRect:self.view.bounds]];
+    [self.renderTaskFrameArray addObject:[NSValue valueWithCGRect:CGRectMake(10, 220, 100, 100)]];
+    [self.renderTaskFrameArray addObject:[NSValue valueWithCGRect:CGRectMake(150, 220, 100, 100)]];
+    [self.renderTaskFrameArray addObject:[NSValue valueWithCGRect:CGRectMake(10, 340, 100, 100)]];
+    [self.renderTaskFrameArray addObject:[NSValue valueWithCGRect:CGRectMake(150, 340, 100, 100)]];
     
 }
 
-- (void)addRenderView{
-    GLRenderView *renderView = [[GLRenderView alloc] init];
-    [self.view addSubview:(_renderView = renderView)];
+- (void)initCameraManager{
+    self.cameraManager = [CameraManager new];
+    self.cameraManager.cameraDelegate = self;
 }
 
-- (void)addCanvasView{
+- (void)initCanvasView{
     MTGLCanvasView *glCanvasView = [[MTGLCanvasView alloc] init];
+    glCanvasView.userInteractionEnabled = NO;
     glCanvasView.backgroundColor = UIColor.orangeColor;
-    [glCanvasView addImg:@"test2.jpg" inFrame:CGRectMake(10, 200, self.view.bounds.size.width-20, 300) scaleImg2Fit:NO];
-    [glCanvasView addImg:@"test1.jpg" inFrame:CGRectMake(0, 100, self.view.bounds.size.width, 200) scaleImg2Fit:NO];
-    [self.view addSubview:(_glCanvasView = glCanvasView)];
+    [self.view insertSubview:(_glCanvasView = glCanvasView) atIndex:0];
 }
 
 - (void)viewDidLayoutSubviews{
     [super viewDidLayoutSubviews];
-#if CANVAS_MODE == 1
     self.glCanvasView.frame = self.view.bounds;
-#else
-    self.renderView.frame = self.view.bounds;
-#endif
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    NSLog(@"%s", __FUNCTION__);
-    [self.glCanvasView startDisplay];
+    if (self.cameraManager.isRunning) {
+        [self.cameraManager stopCapture];
+        [self.glCanvasView stopDisplay];
+    }else{
+        [self.cameraManager startCapture];
+        [self.glCanvasView startDisplay];
+    }
 }
 
-//- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-//    NSInteger temp1 = rand()%5 + 1;
-//    NSInteger temp2 = rand()%5 + 1;
-//    CGFloat width = self.view.bounds.size.width / temp1;
-//    CGFloat height = self.view.bounds.size.width / temp2;
-//    CGFloat x = (self.view.bounds.size.width - width)/2;
-//    CGFloat y = (self.view.bounds.size.height - height)/2;
-//    [UIView animateWithDuration:0.25 animations:^{
-//        self.renderView.frame = CGRectMake(x, y, width, height);
-//    }];
-//}
+- (void)didCaptureVideoFrame:(VideoFrame *)frame{
+    GLuint *texture = NULL;
+    for (NSInteger i = 0; i < self.glCanvasView.taskArray.count; i ++) {
+        MTGLRenderTask *renderTask = self.glCanvasView.taskArray[i];
+        if (texture != NULL) {
+            frame.planarTexture = texture;
+        }
+        renderTask.frame = frame;
+        if (texture == NULL && frame.planarTexture != NULL) {
+            texture = frame.planarTexture;
+        }
+    }
+    free(frame.yuvBuffer);
+    frame.yuvBuffer = NULL;
+}
+
+- (IBAction)addRenderTask:(UIButton *)sender{
+    if (self.currentTaskCount < self.renderTaskFrameArray.count) {
+        [self.glCanvasView addRenderTask:self.renderTaskFrameArray[self.currentTaskCount].CGRectValue withIdentifier:self.currentTaskCount];
+        ++self.currentTaskCount;
+    }
+    if (self.cameraManager.isRunning == NO) {
+        [self.cameraManager startCapture];
+        [self.glCanvasView startDisplay];
+    }
+}
+
+- (IBAction)switchCamera:(id)sender {
+    [self.cameraManager switchCameraPosition:!self.cameraManager.isCameraFront];
+}
+
 
 @end

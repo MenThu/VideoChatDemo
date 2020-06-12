@@ -11,14 +11,13 @@
 
 @implementation YUVManager
 
-+ (NSInteger)converNV12ToI420:(NV12ToI420Model *)converModel{
-   return libyuv::NV12ToI420(converModel.src_y, 0, converModel.src_uv, 0, converModel.dst_y, 0, converModel.dst_u, 0, converModel.dst_v, 0, 0, 0);
++ (NSInteger)converNV12:(unsigned char *)src toToI420:(unsigned char *)dst width:(int)nWidth height:(int)nHeight{
+    return libyuv::NV12ToI420(src, nWidth,
+                              src + nWidth * nHeight, nWidth,
+                              dst, nWidth,
+                              dst + nWidth * nHeight, nWidth >> 1,
+                              dst + nWidth * nHeight * 5 / 4, nWidth >> 1,
+                              nWidth, nHeight);
 }
-
-@end
-
-
-@implementation NV12ToI420Model
-
 
 @end

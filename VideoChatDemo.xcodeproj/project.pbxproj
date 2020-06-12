@@ -15,6 +15,9 @@
 		690201712424D77400CFC704 /* test1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 6902016E2424D77400CFC704 /* test1.jpg */; };
 		690201722424D77400CFC704 /* test2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 6902016F2424D77400CFC704 /* test2.jpg */; };
 		690201732424D77400CFC704 /* test3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 690201702424D77400CFC704 /* test3.jpg */; };
+		690AE3FA2492162100B1D41E /* MTVideoShader.m in Sources */ = {isa = PBXBuildFile; fileRef = 690AE3F92492162100B1D41E /* MTVideoShader.m */; };
+		690AE3FD2492166400B1D41E /* VideoVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 690AE3FB2492166400B1D41E /* VideoVertex.glsl */; };
+		690AE3FE2492166400B1D41E /* VideoFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 690AE3FC2492166400B1D41E /* VideoFragment.glsl */; };
 		69204B4A2312815F00EFC794 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 69204B492312815F00EFC794 /* AppDelegate.m */; };
 		69204B4D2312815F00EFC794 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69204B4C2312815F00EFC794 /* ViewController.m */; };
 		69204B502312815F00EFC794 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 69204B4E2312815F00EFC794 /* Main.storyboard */; };
@@ -71,7 +74,6 @@
 		69C864292465918500BF21FA /* MTGLContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C864262465918500BF21FA /* MTGLContext.m */; };
 		69C8642C2465923D00BF21FA /* MTGLShader.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C8642B2465923D00BF21FA /* MTGLShader.m */; };
 		69C8642F246594B700BF21FA /* MTGLCanvasView.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C8642E246594B700BF21FA /* MTGLCanvasView.m */; };
-		69C864322465981500BF21FA /* MTImgShader.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C864312465981500BF21FA /* MTImgShader.m */; };
 		69C8643524659E8300BF21FA /* MTGLRenderTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C8643424659E8300BF21FA /* MTGLRenderTask.m */; };
 		69E57E9C242B334400ED9174 /* ScreenShot.png in Resources */ = {isa = PBXBuildFile; fileRef = 69E57E9B242B334400ED9174 /* ScreenShot.png */; };
 		69E57E9E242B395600ED9174 /* snapshot.png in Resources */ = {isa = PBXBuildFile; fileRef = 69E57E9D242B395600ED9174 /* snapshot.png */; };
@@ -90,6 +92,10 @@
 		6902016E2424D77400CFC704 /* test1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test1.jpg; sourceTree = "<group>"; };
 		6902016F2424D77400CFC704 /* test2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test2.jpg; sourceTree = "<group>"; };
 		690201702424D77400CFC704 /* test3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = test3.jpg; sourceTree = "<group>"; };
+		690AE3F82492162100B1D41E /* MTVideoShader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTVideoShader.h; sourceTree = "<group>"; };
+		690AE3F92492162100B1D41E /* MTVideoShader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTVideoShader.m; sourceTree = "<group>"; };
+		690AE3FB2492166400B1D41E /* VideoVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VideoVertex.glsl; sourceTree = "<group>"; };
+		690AE3FC2492166400B1D41E /* VideoFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = VideoFragment.glsl; sourceTree = "<group>"; };
 		69204B452312815F00EFC794 /* VideoChatDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VideoChatDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		69204B482312815F00EFC794 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		69204B492312815F00EFC794 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -176,8 +182,6 @@
 		69C8642B2465923D00BF21FA /* MTGLShader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTGLShader.m; sourceTree = "<group>"; };
 		69C8642D246594B700BF21FA /* MTGLCanvasView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTGLCanvasView.h; sourceTree = "<group>"; };
 		69C8642E246594B700BF21FA /* MTGLCanvasView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTGLCanvasView.m; sourceTree = "<group>"; };
-		69C864302465981500BF21FA /* MTImgShader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTImgShader.h; sourceTree = "<group>"; };
-		69C864312465981500BF21FA /* MTImgShader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTImgShader.m; sourceTree = "<group>"; };
 		69C8643324659E8300BF21FA /* MTGLRenderTask.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTGLRenderTask.h; sourceTree = "<group>"; };
 		69C8643424659E8300BF21FA /* MTGLRenderTask.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTGLRenderTask.m; sourceTree = "<group>"; };
 		69E57E9B242B334400ED9174 /* ScreenShot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ScreenShot.png; sourceTree = "<group>"; };
@@ -361,8 +365,10 @@
 				69C8642B2465923D00BF21FA /* MTGLShader.m */,
 				69FF159D248626920082DC74 /* MTGLTool.h */,
 				69FF159E248626920082DC74 /* MTGLTool.m */,
-				69C864302465981500BF21FA /* MTImgShader.h */,
-				69C864312465981500BF21FA /* MTImgShader.m */,
+				690AE3F82492162100B1D41E /* MTVideoShader.h */,
+				690AE3F92492162100B1D41E /* MTVideoShader.m */,
+				690AE3FC2492166400B1D41E /* VideoFragment.glsl */,
+				690AE3FB2492166400B1D41E /* VideoVertex.glsl */,
 			);
 			path = MTGLKit;
 			sourceTree = "<group>";
@@ -438,6 +444,7 @@
 				69204B552312816000EFC794 /* LaunchScreen.storyboard in Resources */,
 				690201712424D77400CFC704 /* test1.jpg in Resources */,
 				690201132424AAAE00CFC704 /* fragment.glsl in Resources */,
+				690AE3FD2492166400B1D41E /* VideoVertex.glsl in Resources */,
 				69E57E9E242B395600ED9174 /* snapshot.png in Resources */,
 				69204B522312816000EFC794 /* Assets.xcassets in Resources */,
 				69E57E9C242B334400ED9174 /* ScreenShot.png in Resources */,
@@ -445,6 +452,7 @@
 				6902016D2424D72D00CFC704 /* test5.jpg in Resources */,
 				690201142424AAAE00CFC704 /* vertex.glsl in Resources */,
 				6902016C2424D72D00CFC704 /* test4.jpg in Resources */,
+				690AE3FE2492166400B1D41E /* VideoFragment.glsl in Resources */,
 				690201722424D77400CFC704 /* test2.jpg in Resources */,
 				690201732424D77400CFC704 /* test3.jpg in Resources */,
 			);
@@ -458,6 +466,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				69B942422490912700F97C8A /* row_gcc.cc in Sources */,
+				690AE3FA2492162100B1D41E /* MTVideoShader.m in Sources */,
 				69B942442490912700F97C8A /* compare_gcc.cc in Sources */,
 				69FC0CBE248FB9F4005B1D32 /* CameraManager.m in Sources */,
 				69B942372490912700F97C8A /* rotate_win.cc in Sources */,
@@ -511,7 +520,6 @@
 				69B9422C2490912700F97C8A /* scale_mips.cc in Sources */,
 				69B942212490912700F97C8A /* mjpeg_decoder.cc in Sources */,
 				69B942242490912700F97C8A /* scale.cc in Sources */,
-				69C864322465981500BF21FA /* MTImgShader.m in Sources */,
 				69B9423F2490912700F97C8A /* rotate_neon.cc in Sources */,
 				690201152424AAAE00CFC704 /* GLRenderView.m in Sources */,
 				69B942322490912700F97C8A /* scale_common.cc in Sources */,

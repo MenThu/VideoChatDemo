@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
-#import "MTImgShader.h"
+#import "MTVideoShader.h"
 #import "MTGLContext.h"
+#import "VideoFrame.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,20 +19,21 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTGLRenderTask : NSObject
 
 @property (nonatomic, strong) MTGLRenderModel *renderModel;
-
+@property (nonatomic, strong) VideoFrame *frame;
 - (void)render;
+- (void)updateViewPort;
 
 @end
 
 @interface MTGLRenderModel : NSObject
 
-@property (nonatomic, strong) NSString *imgName;
+@property (nonatomic, assign) NSUInteger identifier;
 @property (nonatomic, assign) CGSize containerSize;
-@property (nonatomic, assign) BOOL scaleImg2Fit;
 @property (nonatomic, assign) CGRect frame;
 @property (nonatomic, assign) CGFloat contentScale;
 @property (nonatomic, weak) MTGLContext *glContext;
-@property (nonatomic, weak) MTImgShader *imgShader;
+@property (nonatomic, weak) MTVideoShader *videoShader;
+@property (nonatomic, assign) BOOL scale2Fit;
 
 @end
 

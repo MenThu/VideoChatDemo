@@ -10,4 +10,13 @@
 
 @implementation VideoFrame
 
+- (instancetype)init{
+    if (self = [super init]) {
+        self.yuvBuffer = NULL;
+        self.yuvBufferSize = 0;
+        self.needMirror = YES;
+    }
+    return self;
+}
+
 @end

@@ -8,21 +8,23 @@
 
 #import "MTGLCanvasView.h"
 #import "MTGLContext.h"
-#import "MTImgShader.h"
-#import "MTGLRenderTask.h"
+#import "MTVideoShader.h"
 #import "MTGLTool.h"
 #import "MTGLHead.h"
+
+static NSInteger const RENDER_COUNT_PER_SECOND = 60;
 
 @interface MTGLCanvasView ()
 
 @property (nonatomic, strong) MTGLContext *glContext;
-@property (nonatomic, strong) MTImgShader *glShader;
+@property (nonatomic, strong) MTVideoShader *glShader;
 @property (nonatomic, assign) BOOL isOpenGLInit;
 @property (nonatomic, assign) GLuint renderBuffer;
 @property (nonatomic, assign) CGSize pixelSize;
-@property (nonatomic, strong) NSMutableArray <MTGLRenderTask *> *taskArray;
+@property (nonatomic, strong, readwrite) NSMutableArray <MTGLRenderTask *> *taskArray;
 @property (nonatomic, weak) MTGLRenderTask *touchTask;
 @property (nonatomic, assign) CGPoint touchPoint;
+@property (nonatomic, strong) CADisplayLink *displayLink;
 
 @end
 
@@ -56,7 +58,7 @@
         self.glContext = glContext;
         glGenRenderbuffers(1, &self->_renderBuffer);
         
-        MTImgShader *glShader = [[MTImgShader alloc] init];
+        MTVideoShader *glShader = [[MTVideoShader alloc] init];
         self.glShader = glShader;
         self.glContext.programHandle = self.glShader.programHandle;
         
@@ -66,6 +68,13 @@
 
 - (void)layoutSubviews{
     [super layoutSubviews];
+    
+    if (self.pixelSize.width == self.bounds.size.width*self.contentScaleFactor &&
+        self.pixelSize.height == self.bounds.size.height*self.contentScaleFactor) {
+        //防止重复更改
+        return;
+    }
+    
     GLint pixelWidth = 0;
     GLint pixelHeight = 0;
     glBindRenderbuffer(GL_RENDERBUFFER, self.renderBuffer);
@@ -76,13 +85,33 @@
     self.pixelSize = CGSizeMake(pixelWidth, pixelHeight);
     
     for (MTGLRenderTask *task in self.taskArray) {
-        MTGLRenderModel *renderModel = task.renderModel;
-        renderModel.containerSize = self.pixelSize;
-        task.renderModel = renderModel;
+        task.renderModel.containerSize = self.pixelSize;
+        [task updateViewPort];
     }
 }
 
 - (void)startDisplay{
+    if (self.displayLink) {
+        return;
+    }
+
+    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(renderTask)];
+    if (@available(iOS 10.0, *)) {
+        self.displayLink.preferredFramesPerSecond = RENDER_COUNT_PER_SECOND;
+    } else {
+        self.displayLink.frameInterval = 1.0 / RENDER_COUNT_PER_SECOND;
+    }
+    [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+}
+
+- (void)stopDisplay{
+    [self.displayLink invalidate];
+    self.displayLink = nil;
+    glClearColor(0.f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+- (void)renderTask{
     [self.glContext prepareForDraw];
     glFramebufferRenderbuffer(GL_FRAMEBUFFER,
                               GL_COLOR_ATTACHMENT0,
@@ -90,61 +119,28 @@
                               self.renderBuffer);
     glClearColor(0.f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    NSLog(@"%s", __FUNCTION__);
     for (MTGLRenderTask *task in self.taskArray) {
         [task render];
     }
     [self.glContext.context presentRenderbuffer:GL_RENDERBUFFER];
+    glFlush();
     MTGetGLError();
 }
 
-- (void)stopDisplay{
-    glClearColor(0.f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-}
-
-- (void)addImg:(NSString *)imgName inFrame:(CGRect)frame scaleImg2Fit:(BOOL)scaleImg2Fit{
+- (void)addRenderTask:(CGRect)frame withIdentifier:(NSUInteger)identifier{
     MTGLRenderModel *renderModel = [[MTGLRenderModel alloc] init];
-    renderModel.imgName = imgName;
+    renderModel.identifier = identifier;
+    renderModel.scale2Fit = YES;
     renderModel.containerSize = self.pixelSize;
-    renderModel.scaleImg2Fit = scaleImg2Fit;
     renderModel.frame = frame;
-    renderModel.imgShader = self.glShader;
+    renderModel.videoShader = self.glShader;
     renderModel.glContext = self.glContext;
     renderModel.contentScale = self.contentScaleFactor;
 
     MTGLRenderTask *task = [[MTGLRenderTask alloc] init];
     task.renderModel = renderModel;
+    [task updateViewPort];
     [self.taskArray addObject:task];
-}
-
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    self.touchPoint = [touches.anyObject locationInView:self];
-    for (NSInteger index = self.taskArray.count-1; index >= 0; index --) {
-        if (CGRectContainsPoint(self.taskArray[index].renderModel.frame, self.touchPoint)) {
-            self.touchTask = self.taskArray[index];
-            break;
-        }
-    }
-}
-
-- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    if (self.touchTask == nil) {
-        return;
-    }
-    CGPoint movePoint = [touches.anyObject locationInView:self];
-    CGFloat xDistance = movePoint.x - self.touchPoint.x;
-    CGFloat yDistance = movePoint.y - self.touchPoint.y;
-    self.touchPoint = movePoint;
-    CGRect frame = self.touchTask.renderModel.frame;
-    self.touchTask.renderModel.frame = CGRectMake(frame.origin.x + xDistance, frame.origin.y + yDistance, frame.size.width, frame.size.height);
-    
-    
-    [self startDisplay];
-}
-
-- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    self.touchTask = nil;
 }
 
 @end

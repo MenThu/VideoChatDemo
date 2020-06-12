@@ -62,8 +62,9 @@
 
 - (void)prepareForDraw{
     [self useThisContext];
-    glUseProgram(self.programHandle);
     glBindFramebuffer(GL_FRAMEBUFFER, self.frameBuffer);
+    MTGetGLError();
+    glUseProgram(self.programHandle);
     MTGetGLError();
 }
 
