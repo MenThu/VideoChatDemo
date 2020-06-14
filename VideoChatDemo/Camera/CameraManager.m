@@ -24,6 +24,7 @@ static NSInteger const FRAME_PER_SECOND = 20;
 @property (weak, nonatomic) AVCaptureVideoDataOutput *sessionVideoOutput;
 @property (weak, nonatomic) AVCaptureConnection *outputConnection;
 @property (nonatomic, assign, readwrite) BOOL isRunning;
+@property (nonatomic, assign) UIDeviceOrientation currentRotation;
 
 @end
 
@@ -40,6 +41,7 @@ static NSInteger const FRAME_PER_SECOND = 20;
 - (void)initData{
     self.isCameraFront = YES;
     self.isRunning = NO;
+    self.currentRotation = [[UIDevice currentDevice] orientation];
 }
 
 - (void)initSession{
@@ -51,9 +53,9 @@ static NSInteger const FRAME_PER_SECOND = 20;
     /*
      *  创建会话
      */
-    NSString *sessionPreset = AVCaptureSessionPreset1280x720;
+    NSString *sessionPreset = AVCaptureSessionPreset640x480;
     AVCaptureSession *session = [[AVCaptureSession alloc] init];
-    if (![session canSetSessionPreset:sessionPreset]) {
+    if ([session canSetSessionPreset:sessionPreset]) {
         session.sessionPreset = sessionPreset;
     }else{
         session.sessionPreset = AVCaptureSessionPreset640x480;
@@ -288,7 +290,40 @@ static NSInteger const FRAME_PER_SECOND = 20;
 }
 
 - (VideoRotation)getImageRotation{
-    return VideoRotation_90;
+    VideoRotation rotation = VideoRotation_90;
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    switch (orientation) {
+        case UIDeviceOrientationPortrait://home bottom
+            NSLog(@"a");
+            rotation = VideoRotation_90;
+            break;
+        case UIDeviceOrientationLandscapeLeft://home right
+            NSLog(@"b");
+            rotation = VideoRotation_180;
+            break;
+        case UIDeviceOrientationLandscapeRight://home left
+            NSLog(@"c");
+            rotation = VideoRotation_0;
+            break;
+        case UIDeviceOrientationPortraitUpsideDown://home top
+            NSLog(@"d");
+            orientation = self.currentRotation;
+            if (self.currentRotation == UIDeviceOrientationLandscapeRight) {//home left 2 home top
+                NSLog(@"4_1");
+                rotation = VideoRotation_180;
+            }else if (self.currentRotation == UIDeviceOrientationLandscapeLeft){//home right 2 home top
+                NSLog(@"4_2");
+                rotation = VideoRotation_180;
+            }else if (self.currentRotation == UIDeviceOrientationPortrait){//home bottom 2 home top
+                NSLog(@"4_3");
+                rotation = VideoRotation_90;
+            }
+            break;
+        default:
+            break;
+    }
+    self.currentRotation = orientation;
+    return rotation;
 }
 
 @end

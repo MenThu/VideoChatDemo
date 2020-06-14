@@ -81,6 +81,7 @@ typedef struct{
     [self uploadData:vPlane width:(int)frame.width/2 height:(int)frame.height/2 toTextureId:self.yuvTextureId[2]];
     
     
+    
     CGFloat width = frame.width;
     CGFloat height = frame.height;
     if (frame.rotation == VideoRotation_90 ||
@@ -96,9 +97,21 @@ typedef struct{
         CGFloat texturexMinus = 0;
         CGFloat textureyMinus = 0;
         if (minus > 0) {//裁剪x轴
-            textureyMinus = (width - renderBufferWidthDivideHeight*height)/(2*width);
+            CGFloat temp = (width - renderBufferWidthDivideHeight*height)/(2*width);
+            if (frame.rotation == VideoRotation_90 ||
+                frame.rotation == VideoRotation_270) {
+                textureyMinus = temp;
+            }else{
+                texturexMinus = temp;
+            }
         }else{//裁剪y轴
-            texturexMinus = (height - width/renderBufferWidthDivideHeight)/(2*height);
+            CGFloat temp = (height - width/renderBufferWidthDivideHeight)/(2*height);
+            if (frame.rotation == VideoRotation_90 ||
+                frame.rotation == VideoRotation_270) {
+                 texturexMinus = temp;
+            }else{
+                textureyMinus = temp;
+            }
         }
         _shaderCoordinate[0] = (Vertex){{-1, 1, 0}, {texturexMinus, 1-textureyMinus}};  //左上
         _shaderCoordinate[1] = (Vertex){{-1, -1, 0}, {texturexMinus, textureyMinus}};   //左下
@@ -107,10 +120,28 @@ typedef struct{
     }else{//纹理坐标不修改
         CGFloat vertextxMinus = 0;
         CGFloat vertextyMinus = 0;
-        if (minus > 0) {//上下留黑边，但后续需要旋转90度，所以这里裁剪的是X轴
-            vertextxMinus = (self.viewPort.size.height - (self.viewPort.size.width/imgWidthDivideHeight))/self.viewPort.size.height;
-        }else{//左右留黑边
-            vertextyMinus = (self.viewPort.size.width - imgWidthDivideHeight*self.viewPort.size.height)/self.viewPort.size.width;
+        if (minus > 0) {
+            //上下留黑边
+            CGFloat temp = (self.viewPort.size.height - (self.viewPort.size.width/imgWidthDivideHeight))/self.viewPort.size.height;
+            if (frame.rotation == VideoRotation_90 ||
+                frame.rotation == VideoRotation_270) {
+                //后续需要旋转90度，所以这里裁剪的是X轴
+                vertextxMinus = temp;
+            }else{
+                //不需要选择，所以这里裁剪的是Y轴
+                vertextyMinus = temp;
+            }
+        }else{
+            //左右留黑边
+            CGFloat temp = (self.viewPort.size.width - imgWidthDivideHeight*self.viewPort.size.height)/self.viewPort.size.width;
+            if (frame.rotation == VideoRotation_90 ||
+                frame.rotation == VideoRotation_270) {
+                //后续需要旋转90度，所以这里裁剪的是Y轴
+                vertextyMinus = temp;
+            }else{
+                //不需要选择，所以这里裁剪的是X轴
+                vertextxMinus = temp;
+            }
         }
         _shaderCoordinate[0] = (Vertex){{-1+vertextxMinus, 1-vertextyMinus, 0}, {0, 1}};    //左上
         _shaderCoordinate[1] = (Vertex){{-1+vertextxMinus, -1+vertextyMinus, 0}, {0, 0}};   //左下
@@ -177,7 +208,26 @@ typedef struct{
                self.viewPort.size.height);
     
     //绕Z轴顺时针旋转90度
-    GLKMatrix4 modelMatrix = GLKMatrix4MakeRotation(M_PI_2, 0, 0, 1);
+    CGFloat angle = 0;
+    switch (self.frame.rotation) {
+        case VideoRotation_0:
+            angle = 0;
+            break;
+        case VideoRotation_90:
+            angle = M_PI_2;
+            break;
+        case VideoRotation_180:
+            angle = M_PI;
+            break;
+        case VideoRotation_270:
+            angle = M_PI_2*3;
+            break;
+            
+        default:
+            break;
+    }
+    
+    GLKMatrix4 modelMatrix = GLKMatrix4MakeRotation(angle, 0, 0, 1);
     //X轴翻转为镜像效果
     //Y轴翻转为解决纹理坐标与屏幕坐标Y轴相反问题
     modelMatrix = GLKMatrix4Multiply(GLKMatrix4MakeScale(self.frame.needMirror ? -1 : 1, -1, 1), modelMatrix);
@@ -198,9 +248,9 @@ typedef struct{
     MTGetGLError();
     
     //设置index数据
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.renderModel.glContext.indexBuffer);
-//    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-//    MTGetGLError();
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.renderModel.glContext.indexBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    MTGetGLError();
     
     //设置顶点坐标
     glEnableVertexAttribArray(self.renderModel.videoShader.vertexPos);
@@ -213,8 +263,7 @@ typedef struct{
     MTGetGLError();
     
     //绘画
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-//    gldraw(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
     MTGetGLError();
     
     //解除绑定

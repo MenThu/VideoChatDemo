@@ -85,6 +85,7 @@ static NSInteger const RENDER_COUNT_PER_SECOND = 60;
     self.pixelSize = CGSizeMake(pixelWidth, pixelHeight);
     
     for (MTGLRenderTask *task in self.taskArray) {
+        task.renderModel.frame = self.bounds;
         task.renderModel.containerSize = self.pixelSize;
         [task updateViewPort];
     }
@@ -130,7 +131,7 @@ static NSInteger const RENDER_COUNT_PER_SECOND = 60;
 - (void)addRenderTask:(CGRect)frame withIdentifier:(NSUInteger)identifier{
     MTGLRenderModel *renderModel = [[MTGLRenderModel alloc] init];
     renderModel.identifier = identifier;
-    renderModel.scale2Fit = YES;
+    renderModel.scale2Fit = NO;
     renderModel.containerSize = self.pixelSize;
     renderModel.frame = frame;
     renderModel.videoShader = self.glShader;

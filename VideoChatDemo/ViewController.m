@@ -24,6 +24,10 @@
 
 @property (nonatomic, strong) NSMutableArray <NSValue *> *renderTaskFrameArray;
 @property (nonatomic, assign) NSInteger currentTaskCount;
+@property (nonatomic, weak) MTGLRenderTask *touchRenderTask;
+@property (nonatomic, assign) CGPoint touchPoint;
+
+//@property (nonatomic, assign) <#type#> *<#name#>;
 
 @end
 
@@ -66,16 +70,6 @@
     self.glCanvasView.frame = self.view.bounds;
 }
 
-- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
-    if (self.cameraManager.isRunning) {
-        [self.cameraManager stopCapture];
-        [self.glCanvasView stopDisplay];
-    }else{
-        [self.cameraManager startCapture];
-        [self.glCanvasView startDisplay];
-    }
-}
-
 - (void)didCaptureVideoFrame:(VideoFrame *)frame{
     GLuint *texture = NULL;
     for (NSInteger i = 0; i < self.glCanvasView.taskArray.count; i ++) {
@@ -107,5 +101,36 @@
     [self.cameraManager switchCameraPosition:!self.cameraManager.isCameraFront];
 }
 
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    if (self.cameraManager.isRunning) {
+        self.touchPoint = [touches.anyObject locationInView:self.glCanvasView];
+        for (NSInteger index = self.glCanvasView.taskArray.count-1; index >= 0; index --) {
+            if (CGRectContainsPoint(self.glCanvasView.taskArray[index].renderModel.frame, self.touchPoint)) {
+                self.touchRenderTask = self.glCanvasView.taskArray[index];
+                break;
+            }
+        }
+    }else{
+        [self.cameraManager startCapture];
+        [self.glCanvasView startDisplay];
+    }
+}
+
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    CGPoint movePoint = [touches.anyObject locationInView:self.glCanvasView];
+    CGFloat xMove = movePoint.x - self.touchPoint.x;
+    CGFloat yMove = movePoint.y - self.touchPoint.y;
+    CGRect newFrame = CGRectMake(self.touchRenderTask.renderModel.frame.origin.x + xMove,
+                                 self.touchRenderTask.renderModel.frame.origin.y + yMove,
+                                 self.touchRenderTask.renderModel.frame.size.width,
+                                 self.touchRenderTask.renderModel.frame.size.height);
+    self.touchRenderTask.renderModel.frame = newFrame;
+    self.touchPoint = movePoint;
+}
+
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    self.touchRenderTask = nil;
+    self.touchPoint = CGPointZero;
+}
 
 @end
