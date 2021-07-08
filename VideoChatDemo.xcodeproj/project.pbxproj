@@ -77,6 +77,7 @@
 		69C8643524659E8300BF21FA /* MTGLRenderTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 69C8643424659E8300BF21FA /* MTGLRenderTask.m */; };
 		69E57E9C242B334400ED9174 /* ScreenShot.png in Resources */ = {isa = PBXBuildFile; fileRef = 69E57E9B242B334400ED9174 /* ScreenShot.png */; };
 		69E57E9E242B395600ED9174 /* snapshot.png in Resources */ = {isa = PBXBuildFile; fileRef = 69E57E9D242B395600ED9174 /* snapshot.png */; };
+		69E684F12695DC2C00FB499F /* DYVtuberTexturePixelMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 69E684F02695DC2B00FB499F /* DYVtuberTexturePixelMapper.m */; };
 		69FC0CBE248FB9F4005B1D32 /* CameraManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 69FC0CBD248FB9F4005B1D32 /* CameraManager.m */; };
 		69FC0CC1248FBA4D005B1D32 /* VideoFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 69FC0CC0248FBA4D005B1D32 /* VideoFrame.m */; };
 		69FF159F248626920082DC74 /* MTGLTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 69FF159E248626920082DC74 /* MTGLTool.m */; };
@@ -186,6 +187,8 @@
 		69C8643424659E8300BF21FA /* MTGLRenderTask.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTGLRenderTask.m; sourceTree = "<group>"; };
 		69E57E9B242B334400ED9174 /* ScreenShot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ScreenShot.png; sourceTree = "<group>"; };
 		69E57E9D242B395600ED9174 /* snapshot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = snapshot.png; sourceTree = "<group>"; };
+		69E684EF2695DC2B00FB499F /* DYVtuberTexturePixelMapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DYVtuberTexturePixelMapper.h; sourceTree = "<group>"; };
+		69E684F02695DC2B00FB499F /* DYVtuberTexturePixelMapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DYVtuberTexturePixelMapper.m; sourceTree = "<group>"; };
 		69FC0CBC248FB9F4005B1D32 /* CameraManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraManager.h; sourceTree = "<group>"; };
 		69FC0CBD248FB9F4005B1D32 /* CameraManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CameraManager.m; sourceTree = "<group>"; };
 		69FC0CBF248FBA4D005B1D32 /* VideoFrame.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoFrame.h; sourceTree = "<group>"; };
@@ -369,6 +372,8 @@
 				690AE3F92492162100B1D41E /* MTVideoShader.m */,
 				690AE3FC2492166400B1D41E /* VideoFragment.glsl */,
 				690AE3FB2492166400B1D41E /* VideoVertex.glsl */,
+				69E684EF2695DC2B00FB499F /* DYVtuberTexturePixelMapper.h */,
+				69E684F02695DC2B00FB499F /* DYVtuberTexturePixelMapper.m */,
 			);
 			path = MTGLKit;
 			sourceTree = "<group>";
@@ -410,6 +415,7 @@
 		69204B3D2312815F00EFC794 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = DYVtuber;
 				LastUpgradeCheck = 1030;
 				ORGANIZATIONNAME = menthu;
 				TargetAttributes = {
@@ -519,6 +525,7 @@
 				69B942312490912700F97C8A /* convert_from.cc in Sources */,
 				69B9422C2490912700F97C8A /* scale_mips.cc in Sources */,
 				69B942212490912700F97C8A /* mjpeg_decoder.cc in Sources */,
+				69E684F12695DC2C00FB499F /* DYVtuberTexturePixelMapper.m in Sources */,
 				69B942242490912700F97C8A /* scale.cc in Sources */,
 				69B9423F2490912700F97C8A /* rotate_neon.cc in Sources */,
 				690201152424AAAE00CFC704 /* GLRenderView.m in Sources */,

@@ -27,8 +27,6 @@
 @property (nonatomic, weak) MTGLRenderTask *touchRenderTask;
 @property (nonatomic, assign) CGPoint touchPoint;
 
-//@property (nonatomic, assign) <#type#> *<#name#>;
-
 @end
 
 @implementation ViewController
@@ -61,7 +59,7 @@
 - (void)initCanvasView{
     MTGLCanvasView *glCanvasView = [[MTGLCanvasView alloc] init];
     glCanvasView.userInteractionEnabled = NO;
-    glCanvasView.backgroundColor = UIColor.orangeColor;
+    glCanvasView.backgroundColor = UIColor.whiteColor;
     [self.view insertSubview:(_glCanvasView = glCanvasView) atIndex:0];
 }
 

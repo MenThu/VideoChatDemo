@@ -11,6 +11,7 @@
 #import "MTVideoShader.h"
 #import "MTGLTool.h"
 #import "MTGLHead.h"
+#import "DYVtuberTexturePixelMapper.h"
 
 static NSInteger const RENDER_COUNT_PER_SECOND = 60;
 
@@ -25,6 +26,8 @@ static NSInteger const RENDER_COUNT_PER_SECOND = 60;
 @property (nonatomic, weak) MTGLRenderTask *touchTask;
 @property (nonatomic, assign) CGPoint touchPoint;
 @property (nonatomic, strong) CADisplayLink *displayLink;
+@property (nonatomic, strong) DYVtuberTexturePixelMapper *glTexturePixelMapper;
+
 
 @end
 
@@ -46,6 +49,12 @@ static NSInteger const RENDER_COUNT_PER_SECOND = 60;
     self.isOpenGLInit = NO;
     self.taskArray = @[].mutableCopy;
     self.contentScaleFactor = UIScreen.mainScreen.scale;
+    // Get the layer
+    CAEAGLLayer *eaglLayer = (CAEAGLLayer *)self.layer;
+    eaglLayer.drawableProperties = @{kEAGLDrawablePropertyRetainedBacking : @NO,
+                                     kEAGLDrawablePropertyColorFormat     : kEAGLColorFormatRGBA8 };
+    eaglLayer.opaque = YES;
+    self.contentScaleFactor = [UIScreen mainScreen].nativeScale;
 }
 
 - (void)initOpenGL{
@@ -68,21 +77,31 @@ static NSInteger const RENDER_COUNT_PER_SECOND = 60;
 
 - (void)layoutSubviews{
     [super layoutSubviews];
-    
-    if (self.pixelSize.width == self.bounds.size.width*self.contentScaleFactor &&
-        self.pixelSize.height == self.bounds.size.height*self.contentScaleFactor) {
-        //防止重复更改
+        
+    CGSize newSize = self.bounds.size;
+    CGFloat scaleFactor = self.window.screen.nativeScale;
+    newSize.width *= scaleFactor;
+    newSize.height *= scaleFactor;
+    if (CGSizeEqualToSize(newSize, CGSizeZero) ||
+        CGSizeEqualToSize(newSize, self.pixelSize)) {
         return;
     }
     
     GLint pixelWidth = 0;
     GLint pixelHeight = 0;
-    glBindRenderbuffer(GL_RENDERBUFFER, self.renderBuffer);
     [self.glContext useThisContext];
+    glBindRenderbuffer(GL_RENDERBUFFER, self.renderBuffer);
     [self.glContext.context renderbufferStorage:GL_RENDERBUFFER fromDrawable:(CAEAGLLayer *)self.layer];
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_WIDTH, &pixelWidth);
     glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_HEIGHT, &pixelHeight);
-    self.pixelSize = CGSizeMake(pixelWidth, pixelHeight);
+    self.pixelSize = newSize;
+    DYVtuberTexturePixelMapper *texturePixelMapper = self.glTexturePixelMapper;
+    if (texturePixelMapper == nil ||
+        !CGSizeEqualToSize(texturePixelMapper.texturePixelSize, self.pixelSize)) {
+        DYVtuberTexturePixelMapper *texturePixelMapper = [[DYVtuberTexturePixelMapper alloc]
+                                                          initWithPixelSize:newSize];
+        self.glTexturePixelMapper = texturePixelMapper;
+    }
     
     for (MTGLRenderTask *task in self.taskArray) {
         task.renderModel.frame = self.bounds;
@@ -113,18 +132,33 @@ static NSInteger const RENDER_COUNT_PER_SECOND = 60;
 }
 
 - (void)renderTask{
+    DYVtuberTexturePixelMapper *mapper = self.glTexturePixelMapper;
+    if (mapper == nil) {
+        return;
+    }
     [self.glContext prepareForDraw];
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-                              GL_COLOR_ATTACHMENT0,
-                              GL_RENDERBUFFER,
-                              self.renderBuffer);
+    GLuint offscreenTexture = mapper.offscreenTexture;
+    
+    
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, offscreenTexture, 0);
+    
+    
+//    glFramebufferRenderbuffer(GL_FRAMEBUFFER,
+//                              GL_COLOR_ATTACHMENT0,
+//                              GL_RENDERBUFFER,
+//                              self.renderBuffer);
     glClearColor(0.f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     for (MTGLRenderTask *task in self.taskArray) {
         [task render];
     }
-    [self.glContext.context presentRenderbuffer:GL_RENDERBUFFER];
+    
+//    [self.glContext.context presentRenderbuffer:GL_RENDERBUFFER];
     glFlush();
+    static NSUInteger index = 0;
+    if (index++ % 10 == 0) {
+        index = 1;
+    }
     MTGetGLError();
 }
 

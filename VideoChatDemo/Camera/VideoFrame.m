@@ -15,6 +15,7 @@
         self.yuvBuffer = NULL;
         self.yuvBufferSize = 0;
         self.needMirror = YES;
+        self.didRender2Texture = YES;
     }
     return self;
 }

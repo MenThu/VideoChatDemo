@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) VideoFormat format;
 @property (nonatomic, assign) VideoRotation rotation;
 @property (nonatomic, assign) BOOL needMirror;
+@property (nonatomic, assign) BOOL didRender2Texture;
 
 
 @property (nonatomic, assign) uint32_t *planarTexture;

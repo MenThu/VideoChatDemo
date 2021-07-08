@@ -229,10 +229,13 @@ typedef struct{
     
     GLKMatrix4 modelMatrix = GLKMatrix4MakeRotation(angle, 0, 0, 1);
     //X轴翻转为镜像效果
-    //Y轴翻转为解决纹理坐标与屏幕坐标Y轴相反问题
-    modelMatrix = GLKMatrix4Multiply(GLKMatrix4MakeScale(self.frame.needMirror ? -1 : 1, -1, 1), modelMatrix);
+    float sx = self.frame.needMirror ? -1 : 1;
+    //Y轴翻转为解决纹理坐标与屏幕坐标Y轴相反问题 当渲染目标为texture时，不需要翻转
+    float sy = self.frame.didRender2Texture ? 1 : -1;
+    modelMatrix = GLKMatrix4Multiply(GLKMatrix4MakeScale(sx, sy, 1), modelMatrix);
     //设置顶点统一变量
     glUniformMatrix4fv(self.renderModel.videoShader.modelTransform, 1, 0, modelMatrix.m);
+    
     
     //设置纹理
     for (int i = 0; i < YUV_PLANAR_COUNT; i ++) {
