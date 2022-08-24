@@ -21,6 +21,9 @@
 		694329E0231D054A00E85941 /* GLViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 694329DF231D054A00E85941 /* GLViewController.m */; };
 		694329E5231D07A500E85941 /* TriangleVertex.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 694329E3231D07A500E85941 /* TriangleVertex.glsl */; };
 		694329E6231D07A500E85941 /* TriangleFragment.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 694329E4231D07A500E85941 /* TriangleFragment.glsl */; };
+		694DEA4028B4B07C00A950DE /* AudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 694DEA3F28B4B07C00A950DE /* AudioController.m */; };
+		694DEA4428B4B45B00A950DE /* AudioManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 694DEA4328B4B45B00A950DE /* AudioManager.m */; };
+		694DEA4728B4C3BE00A950DE /* AudioHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 694DEA4628B4C3BE00A950DE /* AudioHelper.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +49,12 @@
 		694329DF231D054A00E85941 /* GLViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GLViewController.m; sourceTree = "<group>"; };
 		694329E3231D07A500E85941 /* TriangleVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TriangleVertex.glsl; sourceTree = "<group>"; };
 		694329E4231D07A500E85941 /* TriangleFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TriangleFragment.glsl; sourceTree = "<group>"; };
+		694DEA3E28B4B07C00A950DE /* AudioController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioController.h; sourceTree = "<group>"; };
+		694DEA3F28B4B07C00A950DE /* AudioController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioController.m; sourceTree = "<group>"; };
+		694DEA4228B4B45B00A950DE /* AudioManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioManager.h; sourceTree = "<group>"; };
+		694DEA4328B4B45B00A950DE /* AudioManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioManager.m; sourceTree = "<group>"; };
+		694DEA4528B4C3BE00A950DE /* AudioHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioHelper.h; sourceTree = "<group>"; };
+		694DEA4628B4C3BE00A950DE /* AudioHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioHelper.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,10 +87,13 @@
 		69204B472312815F00EFC794 /* VideoChatDemo */ = {
 			isa = PBXGroup;
 			children = (
+				694DEA4128B4B44500A950DE /* AudioSource */,
 				69204B482312815F00EFC794 /* AppDelegate.h */,
 				69204B492312815F00EFC794 /* AppDelegate.m */,
 				69204B4B2312815F00EFC794 /* ViewController.h */,
 				69204B4C2312815F00EFC794 /* ViewController.m */,
+				694DEA3E28B4B07C00A950DE /* AudioController.h */,
+				694DEA3F28B4B07C00A950DE /* AudioController.m */,
 				694329E1231D064500E85941 /* DrawTrangle */,
 				694329E2231D065E00E85941 /* DrawDataFromCamera */,
 				69204B4E2312815F00EFC794 /* Main.storyboard */,
@@ -117,6 +129,17 @@
 				69204B85231287C300EFC794 /* GLRenderView.m */,
 			);
 			path = DrawDataFromCamera;
+			sourceTree = "<group>";
+		};
+		694DEA4128B4B44500A950DE /* AudioSource */ = {
+			isa = PBXGroup;
+			children = (
+				694DEA4228B4B45B00A950DE /* AudioManager.h */,
+				694DEA4328B4B45B00A950DE /* AudioManager.m */,
+				694DEA4528B4C3BE00A950DE /* AudioHelper.h */,
+				694DEA4628B4C3BE00A950DE /* AudioHelper.m */,
+			);
+			path = AudioSource;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -193,8 +216,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				694DEA4428B4B45B00A950DE /* AudioManager.m in Sources */,
 				694329E0231D054A00E85941 /* GLViewController.m in Sources */,
 				69204B86231287C300EFC794 /* GLRenderView.m in Sources */,
+				694DEA4028B4B07C00A950DE /* AudioController.m in Sources */,
+				694DEA4728B4C3BE00A950DE /* AudioHelper.m in Sources */,
 				69204B4D2312815F00EFC794 /* ViewController.m in Sources */,
 				69204B582312816000EFC794 /* main.m in Sources */,
 				69204B4A2312815F00EFC794 /* AppDelegate.m in Sources */,
