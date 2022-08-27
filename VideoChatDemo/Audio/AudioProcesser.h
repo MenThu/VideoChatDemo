@@ -27,6 +27,8 @@ typedef void(^ConverAudioCallBack)(AudioBuffer converAudioBuffer, UInt32 converP
 
 - (void)inputOrignAudioData:(void *)audioBuffer audioLength:(NSUInteger)audioLength numPackets:(UInt32)numPackets;
 
+@property (nonatomic, assign, readonly) AudioStreamBasicDescription converAudioDesc;
+
 @end
 
 NS_ASSUME_NONNULL_END

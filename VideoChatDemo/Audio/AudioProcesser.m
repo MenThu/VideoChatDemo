@@ -24,7 +24,7 @@
 @property (nonatomic, assign) UInt32 converAudioFormatFlags;
 @property (nonatomic, assign) UInt32 converSampleStep;
 @property (nonatomic, copy) ConverAudioCallBack converAudioCallback;
-@property (nonatomic, assign) AudioStreamBasicDescription converAudioDesc;
+@property (nonatomic, assign, readwrite) AudioStreamBasicDescription converAudioDesc;
 @property (nonatomic, assign) AudioConverterRef audioConverterRef;
 
 @property (nonatomic, assign) void *converAudioBuffer;
@@ -70,7 +70,7 @@
                                                                                            AudioID:kAudioFormatLinearPCM
                                                                                        formatFlags:converAudioFormatFlags];
         self.converAudioDesc = converAudioDesc;
-        self.converSampleStep = (UInt32)floorf((originSampleStep / (float)sampleRate) * originSampleStep);
+        self.converSampleStep = (UInt32)floorf((originSampleStep / (float)sampleRate) * converSampleRate);
         self.converAudioLength = self.converSampleStep * converChannels * (bitsPerChannel/8);
         self.converAudioBuffer = malloc(self.converAudioLength);
         self.converAudioCallback = converCallback;
@@ -163,6 +163,7 @@ static OSStatus AudioConverterFiller(AudioConverterRef inAudioConverter,
     
     NSData *originAudioData = args.count > 1 ? args[1] : nil;
     if(originAudioData == nil || originAudioData.length <= 0){
+        LoggerInfo(kLoggerLevel, @"originAudioData should not be null, please check");
         return NO_MORE_AUDIO_DATA;
     }
     *ioNumberDataPackets = audioConver.originSampleStep;

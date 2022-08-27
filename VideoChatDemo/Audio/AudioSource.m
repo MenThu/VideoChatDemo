@@ -52,6 +52,7 @@
             callback(NO);
         }else{
             [strongSelf setupAudioUnit];
+            callback(YES);
             AudioOutputUnitStart(strongSelf->_audioUnit);
         }
     }];
@@ -165,7 +166,6 @@ static OSStatus handleInputBuffer(void *inRefCon,
                                   UInt32 inBusNumber,
                                   UInt32 inNumberFrames,
                                   AudioBufferList *ioData){
-    
     AudioSource *_thiz = (__bridge AudioSource*)(inRefCon);
     if (_thiz.isPaused) {
         return noErr;
@@ -187,18 +187,19 @@ static OSStatus handleInputBuffer(void *inRefCon,
                                       inNumberFrames,
                                       &buffers);
     if(status == noErr && buffers.mBuffers[0].mData != NULL) {
-        unsigned int audioSize = buffers.mBuffers[0].mDataByteSize;
-        
-        static NSTimeInterval lastLog = 0;
-        static unsigned int lastAudioSize = 0;
-        NSTimeInterval currentLog = NSDate.date.timeIntervalSince1970 * 1000 * 1000;
-        float call_interval = (currentLog - lastLog)/1000.f;
-        if (lastLog > 0) {
-            LoggerInfo(kLoggerLevel, @"inNumberFrames=[%u] call_interval=[%.2f] audioSize=[%u]",
-                       inNumberFrames, call_interval, lastAudioSize);
-        }
-        lastLog = currentLog;
-        lastAudioSize = audioSize;
+//        {
+//            unsigned int audioSize = buffers.mBuffers[0].mDataByteSize;
+//            static NSTimeInterval lastLog = 0;
+//            static unsigned int lastAudioSize = 0;
+//            NSTimeInterval currentLog = NSDate.date.timeIntervalSince1970 * 1000 * 1000;
+//            float call_interval = (currentLog - lastLog)/1000.f;
+//            if (lastLog > 0) {
+//                LoggerInfo(kLoggerLevel, @"inNumberFrames=[%u] call_interval=[%.2f] audioSize=[%u]",
+//                           inNumberFrames, call_interval, lastAudioSize);
+//            }
+//            lastLog = currentLog;
+//            lastAudioSize = audioSize;
+//        }
         _thiz->_callback(buffers.mBuffers[0], inNumberFrames);
     }else{
         [AudioExt checkResult:status operation:"handleInputBuffer"];
