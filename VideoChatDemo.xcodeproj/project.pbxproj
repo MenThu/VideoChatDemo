@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6916DFB928B912C900192391 /* AudioFileWrite.m in Sources */ = {isa = PBXBuildFile; fileRef = 6916DFB828B912C900192391 /* AudioFileWrite.m */; };
 		69204B4A2312815F00EFC794 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 69204B492312815F00EFC794 /* AppDelegate.m */; };
 		69204B4D2312815F00EFC794 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 69204B4C2312815F00EFC794 /* ViewController.m */; };
 		69204B502312815F00EFC794 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 69204B4E2312815F00EFC794 /* Main.storyboard */; };
@@ -24,9 +25,14 @@
 		694DEA4028B4B07C00A950DE /* AudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 694DEA3F28B4B07C00A950DE /* AudioController.m */; };
 		694DEA4428B4B45B00A950DE /* AudioManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 694DEA4328B4B45B00A950DE /* AudioManager.m */; };
 		694DEA4728B4C3BE00A950DE /* AudioHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 694DEA4628B4C3BE00A950DE /* AudioHelper.m */; };
+		69B52FE528BA100500FBECE3 /* AudioSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 69B52FE428BA100500FBECE3 /* AudioSource.m */; };
+		69B52FE828BA13F400FBECE3 /* AudioExt.m in Sources */ = {isa = PBXBuildFile; fileRef = 69B52FE728BA13F400FBECE3 /* AudioExt.m */; };
+		69B52FEB28BA23D600FBECE3 /* AudioProcesser.m in Sources */ = {isa = PBXBuildFile; fileRef = 69B52FEA28BA23D500FBECE3 /* AudioProcesser.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6916DFB728B912C900192391 /* AudioFileWrite.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioFileWrite.h; sourceTree = "<group>"; };
+		6916DFB828B912C900192391 /* AudioFileWrite.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioFileWrite.m; sourceTree = "<group>"; };
 		69204B452312815F00EFC794 /* VideoChatDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VideoChatDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		69204B482312815F00EFC794 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		69204B492312815F00EFC794 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -55,6 +61,12 @@
 		694DEA4328B4B45B00A950DE /* AudioManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioManager.m; sourceTree = "<group>"; };
 		694DEA4528B4C3BE00A950DE /* AudioHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioHelper.h; sourceTree = "<group>"; };
 		694DEA4628B4C3BE00A950DE /* AudioHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioHelper.m; sourceTree = "<group>"; };
+		69B52FE328BA100500FBECE3 /* AudioSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioSource.h; sourceTree = "<group>"; };
+		69B52FE428BA100500FBECE3 /* AudioSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioSource.m; sourceTree = "<group>"; };
+		69B52FE628BA13F400FBECE3 /* AudioExt.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioExt.h; sourceTree = "<group>"; };
+		69B52FE728BA13F400FBECE3 /* AudioExt.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioExt.m; sourceTree = "<group>"; };
+		69B52FE928BA23D500FBECE3 /* AudioProcesser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AudioProcesser.h; sourceTree = "<group>"; };
+		69B52FEA28BA23D500FBECE3 /* AudioProcesser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioProcesser.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +99,7 @@
 		69204B472312815F00EFC794 /* VideoChatDemo */ = {
 			isa = PBXGroup;
 			children = (
+				69B52FE228BA0FD000FBECE3 /* Audio */,
 				694DEA4128B4B44500A950DE /* AudioSource */,
 				69204B482312815F00EFC794 /* AppDelegate.h */,
 				69204B492312815F00EFC794 /* AppDelegate.m */,
@@ -138,8 +151,23 @@
 				694DEA4328B4B45B00A950DE /* AudioManager.m */,
 				694DEA4528B4C3BE00A950DE /* AudioHelper.h */,
 				694DEA4628B4C3BE00A950DE /* AudioHelper.m */,
+				6916DFB728B912C900192391 /* AudioFileWrite.h */,
+				6916DFB828B912C900192391 /* AudioFileWrite.m */,
 			);
 			path = AudioSource;
+			sourceTree = "<group>";
+		};
+		69B52FE228BA0FD000FBECE3 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				69B52FE328BA100500FBECE3 /* AudioSource.h */,
+				69B52FE428BA100500FBECE3 /* AudioSource.m */,
+				69B52FE628BA13F400FBECE3 /* AudioExt.h */,
+				69B52FE728BA13F400FBECE3 /* AudioExt.m */,
+				69B52FE928BA23D500FBECE3 /* AudioProcesser.h */,
+				69B52FEA28BA23D500FBECE3 /* AudioProcesser.m */,
+			);
+			path = Audio;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -221,11 +249,15 @@
 				69204B86231287C300EFC794 /* GLRenderView.m in Sources */,
 				694DEA4028B4B07C00A950DE /* AudioController.m in Sources */,
 				694DEA4728B4C3BE00A950DE /* AudioHelper.m in Sources */,
+				6916DFB928B912C900192391 /* AudioFileWrite.m in Sources */,
 				69204B4D2312815F00EFC794 /* ViewController.m in Sources */,
 				69204B582312816000EFC794 /* main.m in Sources */,
 				69204B4A2312815F00EFC794 /* AppDelegate.m in Sources */,
+				69B52FEB28BA23D600FBECE3 /* AudioProcesser.m in Sources */,
+				69B52FE828BA13F400FBECE3 /* AudioExt.m in Sources */,
 				69204B602312819100EFC794 /* VideoManager.m in Sources */,
 				693E7AF423167A9A00C301D6 /* VideoFrame.m in Sources */,
+				69B52FE528BA100500FBECE3 /* AudioSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

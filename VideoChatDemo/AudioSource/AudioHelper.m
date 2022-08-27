@@ -13,30 +13,32 @@
 + (void)savePCMData:(NSData *)pcmData
          sampleRate:(int)sampleRate
          channelNum:(int)channelNum
-         toFilename:(NSString *)filename {
+     bitsPerChannel:(int)bitsPerChannel
+           byteRate:(int32_t)byteRate
+         toFilename:(NSString *)filename
+         fileFormat:(uint8_t)format{
+//    uint8_t bytePerChannel = bitsPerChannel / 8;
+    uint8_t bitsPerSample = channelNum * bitsPerChannel;
+    
+    NSLog(@"[%s] before save sampleRate=[%d] channelNum=[%d] bitsPerChannel=[%d] bitsPerSample=[%d] byteRate=[%d] format=[%u]",
+          __FUNCTION__, sampleRate, channelNum, bitsPerChannel, bitsPerSample, byteRate, format);
     NSString *cachesDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) firstObject];
     NSString *avlogPath = [NSString stringWithFormat:@"%@/%@", cachesDir, filename];
-    
-    
-//    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-//    NSString *documentsDirectory = [paths objectAtIndex:0];
-//    NSString * path = [NSString stringWithFormat:@"%@/%@",documentsDirectory,fileName];
-//    NSFileManager *fileManager = [NSFileManager defaultManager];
-//    BOOL isDir;
-//    if (![fileManager fileExistsAtPath:path isDirectory:&isDir]) {//先判断目录是否存在，不存在才创建
-//        BOOL res=[fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
-//    }
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:avlogPath]) {
         [[NSFileManager defaultManager] removeItemAtPath:avlogPath error:nil];
     }
+    
+    
     
     NSMutableData *fileData = [[NSMutableData alloc] init];
     NSData *header = [self appendWavFileHeader:pcmData.length
                                   totalDataLen:pcmData.length + 36
                                     sampleRate:sampleRate
                                       channels:channelNum
-                                      byteRate:sampleRate * channelNum * 2];
+                                      byteRate:byteRate         //sampleRate * channelNum * bytePerChannel
+                                 bitsPerSample:bitsPerChannel
+                                    fileFormat:format];
     [fileData appendData:header];
     [fileData appendData:pcmData];
     
@@ -52,7 +54,9 @@
                    totalDataLen:(long)totalDataLen
                      sampleRate:(long)sampleRate
                        channels:(int)channels
-                       byteRate:(long)byteRate {
+                       byteRate:(long)byteRate
+                  bitsPerSample:(uint8_t)bitsPersample
+                     fileFormat:(uint8_t)format{
     Byte header[44];
     header[0] = 'R'; // RIFF/WAVE header
     header[1] = 'I';
@@ -74,7 +78,7 @@
     header[17] = 0;
     header[18] = 0;
     header[19] = 0;
-    header[20] = 1; // format = 1 ,Wave type PCM
+    header[20] = format; // 1，标准PCM；3-float类型
     header[21] = 0;
     header[22] = (Byte)channels; // channels
     header[23] = 0;
@@ -88,7 +92,7 @@
     header[31] = (Byte)((byteRate >> 24) & 0xff);
     header[32] = (Byte)(2 * 16 / 8); // block align
     header[33] = 0;
-    header[34] = 16; // bits per sample
+    header[34] = bitsPersample;//16; // bits per sample
     header[35] = 0;
     header[36] = 'd'; //"data" marker
     header[37] = 'a';

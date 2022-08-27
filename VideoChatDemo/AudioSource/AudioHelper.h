@@ -15,7 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)savePCMData:(NSData *)pcmData
          sampleRate:(int)sampleRate
          channelNum:(int)channelNum
-         toFilename:(NSString *)filename;
+     bitsPerChannel:(int)bitsPerChannel
+           byteRate:(int32_t)byteRate
+         toFilename:(NSString *)filename
+         fileFormat:(uint8_t)format;
 
 @end
 
