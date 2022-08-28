@@ -204,7 +204,7 @@ static OSStatus handleInputBuffer(void *inRefCon,
         _thiz->_callback(buffers.mBuffers[0], inNumberFrames);
         NSTimeInterval after = NSDate.date.timeIntervalSince1970 * 1000;
         UInt32 cost = after - before;
-        LoggerInfo(kLoggerLevel, @"cost=[%u]", cost);
+        LoggerInfo(kLoggerLevel, @"cost=[%u] inNumberFrames=[%u]", cost, inNumberFrames);
     }else{
         [AudioExt checkResult:status operation:"handleInputBuffer"];
     }

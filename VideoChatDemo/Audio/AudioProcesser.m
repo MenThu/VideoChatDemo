@@ -13,65 +13,50 @@
 
 @interface AudioProcesser ()
 
-@property (nonatomic, assign) UInt32 originSamplerRate;
-@property (nonatomic, assign) UInt32 originChannels;
-@property (nonatomic, assign) UInt32 originAudioFormatFlags;
-@property (nonatomic, assign) AudioStreamBasicDescription originAudioDesc;
-@property (nonatomic, assign) UInt32 originSampleStep;
+@property (nonatomic, strong) DYAudioProperty *sourceProperty;
+@property (nonatomic, strong) DYAudioProperty *targetProperty;
 
-@property (nonatomic, assign) UInt32 converSampleRate;
-@property (nonatomic, assign) UInt32 converChannels;
-@property (nonatomic, assign) UInt32 converAudioFormatFlags;
-@property (nonatomic, assign) UInt32 converSampleStep;
+@property (nonatomic, assign) UInt32 sourceConverStep;
+@property (nonatomic, assign) UInt32 targetConverPackets;
+@property (nonatomic, assign) UInt32 sourceStepLength;
+
+@property (nonatomic, strong) NSMutableData *pendingAudioData;
+@property (nonatomic, assign) UInt32 pendingPackets;
+@property (nonatomic, assign) void *converAudioBuffer;
+@property (nonatomic, assign) UInt32 converAudioLength;
+@property (nonatomic, assign) BOOL shoudAudioConverFuncProvideMoreAudioData;
+@property (nonatomic, weak) NSThread *converAudioDataThread;
+
 @property (nonatomic, copy) ConverAudioCallBack converAudioCallback;
 @property (nonatomic, assign, readwrite) AudioStreamBasicDescription converAudioDesc;
 @property (nonatomic, assign) AudioConverterRef audioConverterRef;
 
-@property (nonatomic, assign) void *converAudioBuffer;
-@property (nonatomic, assign) UInt32 converAudioLength;
-
-@property (nonatomic, assign) BOOL shoudAudioConverFuncProvideMoreAudioData;
-@property (nonatomic, weak) NSThread *converAudioDataThread;
 
 @end
 
 @implementation AudioProcesser
 
 #pragma mark - LifeCycle
-- (instancetype)initWithOriginSampleRate:(Float64)sampleRate
-                          originChannels:(UInt32)channels
-                  originAudioFormatFlags:(AudioFormatFlags)audioFormatFlags
-                   originAudioStreamDesc:(AudioStreamBasicDescription)originAudioDesc
-                        originSampleStep:(UInt32)originSampleStep
-                        converSampleRate:(Float64)converSampleRate
-                          converChannels:(UInt32)converChannels
-                  converAudioFormatFlags:(AudioFormatFlags)converAudioFormatFlags
-                          converCallback:(ConverAudioCallBack)converCallback{
+- (instancetype)initWithSourceAudioProperty:(DYAudioProperty *)sourceAduioProperty
+                        targetAudioProperty:(DYAudioProperty *)targetAudioProperty
+                           converSampleStep:(UInt32)converSampleStep
+                             converCallback:(ConverAudioCallBack)converCallback{
     if (self = [super init]) {
-        self.originSamplerRate = sampleRate;
-        self.originChannels = channels;
-        self.originAudioFormatFlags = audioFormatFlags;
-        self.originAudioDesc = originAudioDesc;
-        self.originSampleStep = originSampleStep;
+        self.sourceProperty = sourceAduioProperty;
+        self.targetProperty = targetAudioProperty;
         
-        self.converSampleRate = converSampleRate;
-        self.converChannels = converChannels;
-        self.converAudioFormatFlags = converAudioFormatFlags;
-        UInt32 bitsPerChannel = 0;
-        if (converAudioFormatFlags & kAudioFormatFlagIsSignedInteger) {
-            bitsPerChannel = sizeof(short) * 8;
-        }else if (converAudioFormatFlags & kAudioFormatFlagIsFloat){
-            bitsPerChannel = sizeof(float) * 8;
-        }
-        NSAssert(bitsPerChannel != 0, @"converAudioFormatFlags invalid");
-        AudioStreamBasicDescription converAudioDesc = [AudioExt createAudioBasicDescWithSampleRate:converSampleRate
-                                                                                  channelPerSample:converChannels
-                                                                                    bitsPerChannel:bitsPerChannel
-                                                                                           AudioID:kAudioFormatLinearPCM
-                                                                                       formatFlags:converAudioFormatFlags];
-        self.converAudioDesc = converAudioDesc;
-        self.converSampleStep = (UInt32)floorf((originSampleStep / (float)sampleRate) * converSampleRate);
-        self.converAudioLength = self.converSampleStep * converChannels * (bitsPerChannel/8);
+        self.sourceConverStep = converSampleStep;
+        self.sourceStepLength = self.sourceConverStep * sourceAduioProperty.bytePerSample;
+        float targetConverPacket = ((float)self.sourceConverStep/sourceAduioProperty.audioDesc.mSampleRate) *
+        targetAudioProperty.audioDesc.mSampleRate;
+        self.targetConverPackets =
+        (targetAudioProperty.roundup ? ceilf(targetConverPacket) : floorf(targetConverPacket));
+        
+        self.pendingPackets = 0;
+        self.pendingAudioData = [NSMutableData data];
+        
+        
+        self.converAudioLength = self.targetConverPackets * targetAudioProperty.bytePerSample;
         self.converAudioBuffer = malloc(self.converAudioLength);
         self.converAudioCallback = converCallback;
         self.shoudAudioConverFuncProvideMoreAudioData = NO;
@@ -87,42 +72,33 @@
 }
 
 #pragma mark - Public
-- (void)inputOrignAudioData:(void *)audioBuffer audioLength:(NSUInteger)audioLength numPackets:(UInt32)numPackets{
-    NSAssert(numPackets == self.originSampleStep, @"caller should adjust audio step before this func");
-    bzero(self.converAudioBuffer, self.converAudioLength);
-    AudioBufferList outBuffer;
-    outBuffer.mNumberBuffers = 1;
-    outBuffer.mBuffers[0].mDataByteSize = self.converAudioLength;
-    outBuffer.mBuffers[0].mData = self.converAudioBuffer;
-    outBuffer.mBuffers[0].mNumberChannels = self.converChannels;
-    
-    self.shoudAudioConverFuncProvideMoreAudioData = YES;
-    self.converAudioDataThread = NSThread.currentThread;
-    
-    UInt32 converPackets = self.converSampleStep;
-    
-    NSData *originAudioData = [NSData dataWithBytes:audioBuffer length:audioLength];
-    NSArray *args = @[self, originAudioData];
-    
-    OSStatus result = AudioConverterFillComplexBuffer(_audioConverterRef,
-                                                      AudioConverterFiller,
-                                                      (__bridge void *)(args),
-                                                      &converPackets,
-                                                      &outBuffer,
-                                                      NULL);
-    if (result == noErr || result == NO_MORE_AUDIO_DATA) {
-        LoggerInfo(kLoggerLevel, @"request=[%u] actual=[%u] buffersize=[%u]",
-                   self.converSampleStep, converPackets, outBuffer.mBuffers[0].mDataByteSize);
-        self.converAudioCallback(outBuffer.mBuffers[0], converPackets);
-    }else{
-        [AudioExt checkResult:result operation:"onInputPCMData"];
+- (void)processAudioBuffer:(void *)audioBuffer audioLength:(NSUInteger)audioLength audioPackets:(UInt32)audioPackets{
+    @autoreleasepool {
+        self.pendingPackets += audioPackets;
+        [self.pendingAudioData appendBytes:audioBuffer length:audioLength];
+        
+        void *tempBuffer = (void *)self.pendingAudioData.bytes;
+        while (self.pendingPackets / self.sourceConverStep >= 1) {
+            NSData *audioData = [NSData dataWithBytes:tempBuffer length:self.sourceStepLength];
+            [self doAudioConver:audioData];
+            self.pendingPackets -= self.sourceConverStep;
+            tempBuffer += self.sourceStepLength;
+        }
+        UInt32 leftLength = self.pendingPackets * self.sourceProperty.bytePerSample;
+        self.pendingAudioData = [NSMutableData dataWithBytes:tempBuffer length:leftLength];
     }
+}
+
+- (void)endProcessed{
+    self.pendingAudioData = nil;
 }
 
 #pragma mark - AudioConver相关
 - (void)setupAudioConver{
     [self releaseAudioConverIfNeed];
-    OSStatus result = AudioConverterNew(&_originAudioDesc, &_converAudioDesc, &_audioConverterRef);
+    AudioStreamBasicDescription source = self.sourceProperty.audioDesc;
+    AudioStreamBasicDescription target = self.targetProperty.audioDesc;
+    OSStatus result = AudioConverterNew(&source, &target, &_audioConverterRef);
     if (result != noErr
         || _audioConverterRef == NULL) {
         [AudioExt checkResult:result operation:__FUNCTION__];
@@ -141,6 +117,40 @@
     if (self.converAudioBuffer != NULL) {
         free(self.converAudioBuffer);
         self.converAudioBuffer = NULL;
+    }
+}
+
+- (void)doAudioConver:(NSData *)audioData{
+    bzero(self.converAudioBuffer, self.converAudioLength);
+    AudioBufferList outBuffer;
+    outBuffer.mNumberBuffers = 1;
+    outBuffer.mBuffers[0].mDataByteSize = self.converAudioLength;
+    outBuffer.mBuffers[0].mData = self.converAudioBuffer;
+    outBuffer.mBuffers[0].mNumberChannels = self.targetProperty.audioDesc.mChannelsPerFrame;
+    
+    self.shoudAudioConverFuncProvideMoreAudioData = YES;
+    self.converAudioDataThread = NSThread.currentThread;
+    
+    UInt32 converPackets = self.targetConverPackets;
+    
+    NSArray *args = @[self, audioData];
+    
+    OSStatus result = AudioConverterFillComplexBuffer(_audioConverterRef,
+                                                      AudioConverterFiller,
+                                                      (__bridge void *)(args),
+                                                      &converPackets,
+                                                      &outBuffer,
+                                                      NULL);
+    if (result == noErr || result == NO_MORE_AUDIO_DATA) {
+        LoggerInfo(kLoggerLevel, @"samplerate=[%u][%u] request=[%u] actual=[%u] buffersize=[%u]",
+                   (UInt32)self.sourceProperty.audioDesc.mSampleRate,
+                   (UInt32)self.targetProperty.audioDesc.mSampleRate,
+                   self.targetConverPackets,
+                   converPackets,
+                   outBuffer.mBuffers[0].mDataByteSize);
+        self.converAudioCallback(outBuffer.mBuffers[0], converPackets);
+    }else{
+        [AudioExt checkResult:result operation:"onInputPCMData"];
     }
 }
 
@@ -166,11 +176,11 @@ static OSStatus AudioConverterFiller(AudioConverterRef inAudioConverter,
         LoggerInfo(kLoggerLevel, @"originAudioData should not be null, please check");
         return NO_MORE_AUDIO_DATA;
     }
-    *ioNumberDataPackets = audioConver.originSampleStep;
+    *ioNumberDataPackets = audioConver.sourceConverStep;
     
     ioData->mBuffers[0].mData = (void *)originAudioData.bytes;
     ioData->mBuffers[0].mDataByteSize = (UInt32)originAudioData.length;
-    ioData->mBuffers[0].mNumberChannels = audioConver.originChannels;
+    ioData->mBuffers[0].mNumberChannels = audioConver.targetProperty.audioDesc.mChannelsPerFrame;
     ioData->mNumberBuffers = 1;
     
     if (outDataPacketDescription) {
@@ -184,5 +194,9 @@ static OSStatus AudioConverterFiller(AudioConverterRef inAudioConverter,
     return noErr;
 }
 
+
+@end
+
+@implementation DYAudioProperty
 
 @end
