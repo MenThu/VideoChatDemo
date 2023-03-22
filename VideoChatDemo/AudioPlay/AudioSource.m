@@ -10,6 +10,13 @@
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
 
+static OSStatus handleInputBuffer(void *inRefCon,
+                                  AudioUnitRenderActionFlags *ioActionFlags,
+                                  const AudioTimeStamp *inTimeStamp,
+                                  UInt32 inBusNumber,
+                                  UInt32 inNumberFrames,
+                                  AudioBufferList *ioData);
+
 @interface AudioSource ()
 
 @property (nonatomic, assign) UInt32 sampleRate;
@@ -35,6 +42,7 @@
         self.channels = channels;
         self.audioFormatFlags = audioFormatFlags;
         self.callback = callback;
+        self.isAudioUnitRemoteIO = YES;
     }
     return self;
 }
@@ -44,6 +52,19 @@
 }
 
 #pragma mark - Public方法
++ (void)enableAudioSession{
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    [session setCategory:AVAudioSessionCategoryPlayAndRecord
+             withOptions:AVAudioSessionCategoryOptionMixWithOthers | AVAudioSessionCategoryOptionAllowBluetooth
+                   error:nil];
+    [session setMode:AVAudioSessionModeVoiceChat error:nil];
+    [session setActive:YES error:nil];
+}
+
++ (void)disableAudioSession{
+    [[AVAudioSession sharedInstance] setActive:NO error:nil];
+}
+
 - (void)startRecord:(void (^) (BOOL succ))callback{
     __weak typeof(self) weakSelf = self;
     [self requestAuthorization:^(BOOL didAuthorized) {
@@ -62,16 +83,9 @@
     if(_audioUnit) {
         AudioOutputUnitStop(_audioUnit);
     }
-    [[AVAudioSession sharedInstance] setActive:NO error:nil];
 }
 
 - (void)resume{
-    AVAudioSession *session = [AVAudioSession sharedInstance];
-    [session setCategory:AVAudioSessionCategoryPlayAndRecord
-             withOptions:AVAudioSessionCategoryOptionMixWithOthers | AVAudioSessionCategoryOptionAllowBluetooth
-                   error:nil];
-    [session setActive:YES error:nil];
-    
     if(_audioUnit) {
         AudioOutputUnitStart(_audioUnit);
     }
@@ -82,7 +96,6 @@
         //stop audio unit
         AudioOutputUnitStop(_audioUnit);
         AudioComponentInstanceDispose(_audioUnit);
-        [[AVAudioSession sharedInstance] setActive:NO error:nil];
         _audioUnit = NULL;
     }
 }
@@ -98,23 +111,12 @@
     }
 }
 
-static OSStatus handleInputBuffer(void *inRefCon,
-                                  AudioUnitRenderActionFlags *ioActionFlags,
-                                  const AudioTimeStamp *inTimeStamp,
-                                  UInt32 inBusNumber,
-                                  UInt32 inNumberFrames,
-                                  AudioBufferList *ioData);
 - (void)setupAudioUnit{
     __weak typeof(self) weakSelf = self;
-    AVAudioSession *session = [AVAudioSession sharedInstance];
-    [session setCategory:AVAudioSessionCategoryPlayAndRecord
-             withOptions:AVAudioSessionCategoryOptionMixWithOthers | AVAudioSessionCategoryOptionAllowBluetooth
-                   error:nil];
-    [session setActive:YES error:nil];
     
     AudioComponentDescription acd;
     acd.componentType = kAudioUnitType_Output;
-    acd.componentSubType = kAudioUnitSubType_RemoteIO;
+    acd.componentSubType = self.isAudioUnitRemoteIO ? kAudioUnitSubType_RemoteIO : kAudioUnitSubType_VoiceProcessingIO;
     acd.componentManufacturer = kAudioUnitManufacturer_Apple;
     acd.componentFlags = 0;
     acd.componentFlagsMask = 0;
@@ -152,6 +154,16 @@ static OSStatus handleInputBuffer(void *inRefCon,
         [AudioExt checkResult:result operation:__FUNCTION__];
         return;
     }
+    
+    //禁止掉AudioUnit的输出能力,避免后续的AudioUnit Render为-1
+    AudioUnitElement outputBus = 0;
+    UInt32 disableFlag = 0;
+    result = AudioUnitSetProperty(_audioUnit,
+                                  kAudioOutputUnitProperty_EnableIO,
+                                  kAudioUnitScope_Output,
+                                  outputBus,
+                                  &disableFlag,
+                                  sizeof(disableFlag));
     
     AudioUnitSetProperty(_audioUnit, kAudioOutputUnitProperty_SetInputCallback,
                          kAudioUnitScope_Global, 1, &cb, sizeof(cb));

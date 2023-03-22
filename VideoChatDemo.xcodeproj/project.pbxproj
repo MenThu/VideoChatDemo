@@ -99,7 +99,8 @@
 		69204B472312815F00EFC794 /* VideoChatDemo */ = {
 			isa = PBXGroup;
 			children = (
-				69B52FE228BA0FD000FBECE3 /* Audio */,
+				69387F1829912E4E00B24064 /* AudioPlayer */,
+				69B52FE228BA0FD000FBECE3 /* AudioPlay */,
 				694DEA4128B4B44500A950DE /* AudioSource */,
 				69204B482312815F00EFC794 /* AppDelegate.h */,
 				69204B492312815F00EFC794 /* AppDelegate.m */,
@@ -116,6 +117,13 @@
 				69204B572312816000EFC794 /* main.m */,
 			);
 			path = VideoChatDemo;
+			sourceTree = "<group>";
+		};
+		69387F1829912E4E00B24064 /* AudioPlayer */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = AudioPlayer;
 			sourceTree = "<group>";
 		};
 		694329E1231D064500E85941 /* DrawTrangle */ = {
@@ -157,7 +165,7 @@
 			path = AudioSource;
 			sourceTree = "<group>";
 		};
-		69B52FE228BA0FD000FBECE3 /* Audio */ = {
+		69B52FE228BA0FD000FBECE3 /* AudioPlay */ = {
 			isa = PBXGroup;
 			children = (
 				69B52FE328BA100500FBECE3 /* AudioSource.h */,
@@ -167,7 +175,7 @@
 				69B52FE928BA23D500FBECE3 /* AudioProcesser.h */,
 				69B52FEA28BA23D500FBECE3 /* AudioProcesser.m */,
 			);
-			path = Audio;
+			path = AudioPlay;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

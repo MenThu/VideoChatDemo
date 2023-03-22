@@ -16,6 +16,7 @@ typedef void(^AudioDataCallBack)(AudioBuffer audioBuffer, UInt32 audioPackets);
 
 @interface AudioSource : NSObject
 
++ (void)enableAudioSession;
 - (instancetype)initWithSampleRate:(Float64)sampleRate
                           channels:(UInt32)channels
                   audioFormatFlags:(AudioFormatFlags)audioFormatFlags
@@ -26,6 +27,7 @@ typedef void(^AudioDataCallBack)(AudioBuffer audioBuffer, UInt32 audioPackets);
 - (void)stopRecord;
 
 @property (nonatomic, assign, readonly) AudioStreamBasicDescription recordAudioDesc;
+@property (nonatomic, assign) BOOL isAudioUnitRemoteIO;
 
 @end
 
